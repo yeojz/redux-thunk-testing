@@ -1,54 +1,82 @@
-import { MiddlewareAPI, Dispatch } from 'redux';
+import { actionZero, actionTypes } from '../examples/actions';
+import { ActionTester, JestTester, SimpleTester } from './index';
 
-let api: MiddlewareAPI<Dispatch, any>;
+interface TestSuite {
+  name: string;
+  getTester(): ActionTester;
+}
 
-import {
-  standardAsyncMiddleware,
-  createStandardAsyncMiddleware
-} from './index';
+function runTesterSuite(option: TestSuite) {
+  async function runActionCheck(extraArgs: any, expectedResult: Array<string>) {
+    const tester = option.getTester();
 
-describe('index', () => {
-  const dispatch = jest.fn();
-  const actionNormal = {
-    type: 'TEST',
-    payload: {}
-  };
+    tester.setArgs(null, extraArgs);
+    await tester.run(actionZero());
 
-  const actionFn = {
-    type: 'TEST',
-    payload: jest.fn()
-  };
+    expect(tester.callTypes).toEqual(expectedResult);
+  }
 
-  beforeEach(() => {
-    dispatch.mockReset();
-    actionFn.payload.mockReset();
-  });
-
-  describe('payload IS NOT a function', () => {
-    test('calls next with action AS-IS', () => {
-      standardAsyncMiddleware(api)(dispatch)(actionNormal);
-
-      expect(dispatch.mock.calls.length).toEqual(1);
-    });
-  });
-
-  describe('payload IS a function', () => {
-    test('calls next with action + thunk', () => {
-      standardAsyncMiddleware(api)(dispatch)(actionFn);
-
-      expect(dispatch.mock.calls.length).toEqual(2);
-      expect(dispatch.mock.calls[1][0]).toEqual(actionFn.payload);
+  describe(option.name, () => {
+    test('path 0 -> 3 -> 6', async () => {
+      await runActionCheck({}, [
+        actionTypes.ACTION_0,
+        actionTypes.ACTION_3,
+        actionTypes.ACTION_6
+      ]);
     });
 
-    test('calls next with thunk only', () => {
-      const middleware = createStandardAsyncMiddleware({
-        dispatchStart: false
-      });
+    test('path 0 -> 1 -> 4', async () => {
+      await runActionCheck(
+        {
+          one: true
+        },
+        [actionTypes.ACTION_0, actionTypes.ACTION_1, actionTypes.ACTION_4]
+      );
+    });
 
-      middleware(api)(dispatch)(actionFn);
+    test('path 0 -> 1 -> 2 -> 4', async () => {
+      await runActionCheck(
+        {
+          one: true,
+          two: true,
+          four: true
+        },
+        [
+          actionTypes.ACTION_0,
+          actionTypes.ACTION_1,
+          actionTypes.ACTION_2,
+          actionTypes.ACTION_4
+        ]
+      );
+    });
 
-      expect(dispatch.mock.calls.length).toEqual(1);
-      expect(dispatch.mock.calls[0][0]).toEqual(actionFn.payload);
+    test('path 0 -> 1 -> 2 -> 5 -> 6', async () => {
+      await runActionCheck(
+        {
+          one: true,
+          two: true
+        },
+        [
+          actionTypes.ACTION_0,
+          actionTypes.ACTION_1,
+          actionTypes.ACTION_2,
+          actionTypes.ACTION_5,
+          actionTypes.ACTION_6
+        ]
+      );
     });
   });
+}
+
+describe('utils', () => {
+  [
+    {
+      name: 'SimpleTester',
+      getTester: () => new SimpleTester()
+    },
+    {
+      name: 'JestTester',
+      getTester: () => new JestTester(jest.fn())
+    }
+  ].forEach(runTesterSuite);
 });

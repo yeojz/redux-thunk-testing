@@ -1,7 +1,7 @@
 {
-  "name": "redux-standard-async",
+  "name": "redux-thunk-testing",
   "version": "0.0.0",
-  "description": ":nut_and_bolt: A pattern for async thunk actions with testing utilities",
+  "description": ":nut_and_bolt: Test utilites for less painful async thunk testing",
   "main": "./index.js",
   "scripts": {
     "build": "./build.sh",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yeojz/redux-standard-async.git"
+    "url": "git+https://github.com/yeojz/redux-thunk-testing.git"
   },
   "keywords": [
     "testing",
@@ -32,9 +32,9 @@
   "author": "Gerald Yeo <contact@fusedthought.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/yeojz/redux-standard-async/issues"
+    "url": "https://github.com/yeojz/redux-thunk-testing/issues"
   },
-  "homepage": "https://github.com/yeojz/redux-standard-async#readme",
+  "homepage": "https://github.com/yeojz/redux-thunk-testing#readme",
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.4",
