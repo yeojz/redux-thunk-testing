@@ -1,39 +1,81 @@
 import { FluxStandardAction } from './global';
 
-export type CalledActions = Array<FluxStandardAction<any>>;
-export type CalledActionsJest = Array<CalledActions>;
-export type ThunkArgs = Array<any>;
+export type CallList = Array<FluxStandardAction<any>>;
+export type ActionType = string;
+export type JestCallList = Array<CallList>;
+export type ThunkArgs = [(Function | null)?, any?];
 
 export interface ActionTester {
-  readonly calls: CalledActions;
-  readonly listTypes: Array<string>;
-  push(action: any): void;
-  run(action: FluxStandardAction<any>): any;
-  setThunkArgs(getState: Function | null, extraArgument: any): void;
+  /**
+   * Gets a list of dispatched actions
+   * in the order in which they were called.
+   *
+   * @returns array of FSA object
+   */
+  readonly calls: CallList;
+
+  /**
+   * Gets a list containing only the type of dispatched actions
+   * in the order in which they were called
+   *
+   * @returns array of action.type
+   */
+  readonly callTypes: Array<ActionType>;
+
+  /**
+   * Adds to list of dispatched values
+   *
+   * @param action - Flux Standard Action
+   * @returns void
+   */
+  add(action: FluxStandardAction<any>): void;
+
+  /**
+   * Runs an action and returns the value of the functional payload
+   * or the original action.
+   *
+   * @returns Flux Standard Action
+   * @returns Promise - for async functions
+   * @returns Any basic type
+   */
+  run(
+    action: FluxStandardAction<any>
+  ): FluxStandardAction<any> | Promise<any> | any;
+
+  /**
+   * Sets the remaining 2 arguments of a thunk action.
+   *
+   * @param getState - Mock store.getState function
+   * @param extraArgument - Mock values injected via thunk.withExtraArgument
+   */
+  setArgs(getState: Function | null, extraArgument: any): void;
 }
 
+/**
+ * A test framework independent ActionTester
+ */
 export class SimpleTester implements ActionTester {
-  calledActions: CalledActions = [];
+  callList: CallList = [];
   thunkArgs: ThunkArgs = [];
 
-  get calls(): CalledActions {
-    return this.calledActions;
+  get calls() {
+    return this.callList;
   }
 
-  get listTypes(): Array<string> {
+  get callTypes() {
     return this.calls.map((action: FluxStandardAction<any>) => action.type);
-  };
+  }
 
-  setThunkArgs = (getState: Function | null, extraArgument: any) => {
+  setArgs = (getState: Function | null, extraArgument: any) => {
     this.thunkArgs = [getState, extraArgument];
   };
 
-  push = (action: FluxStandardAction<any>): void => {
-    this.calledActions.push(action);
+  add = (action: FluxStandardAction<any>) => {
+    this.callList.push(action);
   };
 
-  run = (action: FluxStandardAction<any>): FluxStandardAction<any> => {
-    this.push(action);
+  run = (action: FluxStandardAction<any>) => {
+    this.add(action);
 
     return action && typeof action.payload === 'function'
       ? action.payload(this.run, ...this.thunkArgs)
@@ -41,17 +83,25 @@ export class SimpleTester implements ActionTester {
   };
 }
 
+/**
+ * Jest compatible ActionTester
+ */
 export class JestTester extends SimpleTester {
   dispatch: any;
 
+  /**
+   * Takes in jest mock function
+   *
+   * @param fn - jest.fn()
+   */
   constructor(fn: Function) {
     super();
     this.dispatch = fn;
   }
 
-  get calls(): CalledActions {
-    return this.dispatch.mock.calls.map((c: CalledActionsJest) => c[0]);
+  get calls() {
+    return this.dispatch.mock.calls.map((c: JestCallList) => c[0]);
   }
 
-  push = (action: FluxStandardAction<any>) => this.dispatch(action);
+  add = (action: FluxStandardAction<any>) => this.dispatch(action);
 }

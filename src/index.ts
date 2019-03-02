@@ -1,12 +1,16 @@
 import { Dispatch, Middleware } from 'redux';
 import { AsyncStandardAction, FluxStandardAction } from './global';
 
-export interface standardAsyncOptions {
+export interface StandardAsyncOptions {
+  /**
+   * Determines if the action with a thunk payload
+   * should be dispatched before dispatching the thunk
+   */
   dispatchStart?: boolean;
 }
 
 export function createStandardAsyncMiddleware(
-  options: standardAsyncOptions
+  options: StandardAsyncOptions
 ): Middleware {
   const { dispatchStart = true } = options;
 
@@ -16,12 +20,12 @@ export function createStandardAsyncMiddleware(
     if (typeof action.payload === 'function') {
       const { payload, ...rest } = action;
 
-      // announce action start
+      // Announce action start
       if (dispatchStart) {
         next(rest);
       }
 
-      // convert to a thunk action
+      // Convert to a thunk action
       return next(action.payload);
     }
 

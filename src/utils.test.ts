@@ -10,10 +10,10 @@ function runTesterSuite(option: TestSuite) {
   async function runActionCheck(extraArgs: any, expectedResult: Array<string>) {
     const tester = option.getTester();
 
-    tester.setThunkArgs(null, extraArgs);
+    tester.setArgs(null, extraArgs);
     await tester.run(actionZero());
 
-    expect(tester.listTypes).toEqual(expectedResult);
+    expect(tester.callTypes).toEqual(expectedResult);
   }
 
   describe(option.name, () => {
