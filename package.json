@@ -11,6 +11,7 @@
     "lint:js": "eslint 'src/**/**?(.spec|).js'",
     "lint:ts": "tsc --noEmit",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "test:watch": "jest --watch"
   },
   "repository": {

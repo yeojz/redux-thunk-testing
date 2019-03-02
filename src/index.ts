@@ -1,5 +1,7 @@
 import { FluxStandardAction } from './common';
 
+export const ANONYMOUS_ACTION = 'ANONYMOUS_ACTION';
+
 export type CallList = Array<FluxStandardAction<any>>;
 export type ActionType = string;
 export type JestCallList = Array<CallList>;
@@ -83,12 +85,23 @@ export class SimpleTester implements ActionTester {
     this.callList.push(action);
   };
 
-  run = (action: FluxStandardAction<any>) => {
+  run = (
+    action: FluxStandardAction<any> | Function
+  ): FluxStandardAction<any> | Promise<any> | any => {
+    if (typeof action === 'function') {
+      return this.run({
+        type: ANONYMOUS_ACTION,
+        payload: action
+      });
+    }
+
     this.add(action);
 
-    return action && typeof action.payload === 'function'
-      ? this.runThunk(action.payload)
-      : action;
+    if (typeof action.payload === 'function') {
+      return this.runThunk(action.payload);
+    }
+
+    return action;
   };
 
   runThunk = (

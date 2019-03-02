@@ -21,10 +21,16 @@
 
 ## The problem
 
-[redux-thunk](https://github.com/reduxjs/redux-thunk) is a simple and flexible middleware for redux
+[redux-thunk](https://www.npmjs.com/package/redux-thunk) is a simple middleware
+for async and side-effects logic, and is nearly as ubiquitous as redux itself.
+
+However, as we add more complex async actions, it becomes harder and more unwieldy to test.
+There are projects [redux-saga](https://www.npmjs.com/package/redux-saga) which are designed to handle
+such cases, but it might not be a viable option depending on requirements and project at hand.
 
 ## About this package
 
+`redux-thunk-testing` is a utility class for testing these complex thunk actions and their side effects.
 
 ## Installation
 
@@ -35,6 +41,18 @@ npm install redux-thunk-testing --save
 ```
 
 ## Getting Started
+
+```js
+export function action1() {
+  return {
+    type: "ACTION_1",
+    payload: async (dispatch) => {
+      await dispatch(action2());
+      await dispatch(action3());
+    }
+  };
+}
+```
 
 ## License
 

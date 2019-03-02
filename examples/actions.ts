@@ -1,4 +1,4 @@
-import { FluxStandardAction } from '../src/global';
+import { FluxStandardAction } from '../src/common';
 
 type Action = FluxStandardAction<any>;
 
