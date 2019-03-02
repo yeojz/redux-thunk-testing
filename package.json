@@ -4,7 +4,7 @@
   "description": ":nut_and_bolt: A pattern for async thunk actions with testing utilities",
   "main": "./index.js",
   "scripts": {
-    "build": "./scripts/build.sh",
+    "build": "./build.sh",
     "build:code": "babel src --out-dir build --extensions '.ts' --ignore '**/*.test.ts'",
     "build:types": "tsc --emitDeclarationOnly",
     "clean": "rimraf build coverage",
