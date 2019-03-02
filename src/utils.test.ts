@@ -1,10 +1,5 @@
 import { actionZero, actionTypes } from '../examples/actions';
-import {
-  JestTester,
-  SimpleTester,
-  getDispatchFlow,
-  ActionTester
-} from './utils';
+import { ActionTester, JestTester, SimpleTester } from './utils';
 
 interface TestSuite {
   name: string;
@@ -12,13 +7,13 @@ interface TestSuite {
 }
 
 function runTesterSuite(option: TestSuite) {
-  async function runActionCheck(extraArgs: any, exepctedResult: Array<string>) {
+  async function runActionCheck(extraArgs: any, expectedResult: Array<string>) {
     const tester = option.getTester();
 
     tester.setThunkArgs(null, extraArgs);
     await tester.run(actionZero());
 
-    expect(getDispatchFlow(tester)).toEqual(exepctedResult);
+    expect(tester.listTypes).toEqual(expectedResult);
   }
 
   describe(option.name, () => {

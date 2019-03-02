@@ -36,7 +36,7 @@ export function actionFour(): Action {
 export function actionThree(): Action {
   return {
     type: actionTypes.ACTION_3,
-    payload: async (dispatch: Function) => {
+    payload: async (dispatch: Function): any => {
       await dispatch(actionSix());
     }
   };
@@ -45,7 +45,7 @@ export function actionThree(): Action {
 export function actionTwo(): Action {
   return {
     type: actionTypes.ACTION_2,
-    payload: async (dispatch: Function, _: any, extraArgs: any) => {
+    payload: async (dispatch: Function, _: any, extraArgs: any): any => {
       if (extraArgs.four) {
         await dispatch(actionFour());
         return {};
@@ -59,7 +59,7 @@ export function actionTwo(): Action {
 export function actionOne(): Action {
   return {
     type: actionTypes.ACTION_1,
-    payload: async (dispatch: Function, _: any, extraArgs: any) => {
+    payload: async (dispatch: Function, _: any, extraArgs: any): any => {
       if (extraArgs.two) {
         return extraArgs;
       }
@@ -72,7 +72,7 @@ export function actionOne(): Action {
 export function actionZero(): Action {
   return {
     type: actionTypes.ACTION_0,
-    payload: async (dispatch: Function, _: any, extraArgs: any) => {
+    payload: async (dispatch: Function, _: any, extraArgs: any): any => {
       if (extraArgs.one) {
         const result = await dispatch(actionOne());
 

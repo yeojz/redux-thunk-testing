@@ -6,6 +6,7 @@ export type ThunkArgs = Array<any>;
 
 export interface ActionTester {
   readonly calls: CalledActions;
+  readonly listTypes: Array<string>;
   push(action: any): void;
   run(action: FluxStandardAction<any>): any;
   setThunkArgs(getState: Function | null, extraArgument: any): void;
@@ -18,6 +19,10 @@ export class SimpleTester implements ActionTester {
   get calls(): CalledActions {
     return this.calledActions;
   }
+
+  get listTypes(): Array<string> {
+    return this.calls.map((action: FluxStandardAction<any>) => action.type);
+  };
 
   setThunkArgs = (getState: Function | null, extraArgument: any) => {
     this.thunkArgs = [getState, extraArgument];
@@ -49,8 +54,4 @@ export class JestTester extends SimpleTester {
   }
 
   push = (action: FluxStandardAction<any>) => this.dispatch(action);
-}
-
-export function getDispatchFlow(dispatch: ActionTester): Array<string> {
-  return dispatch.calls.map((action: FluxStandardAction<any>) => action.type);
 }
