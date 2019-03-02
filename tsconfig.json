@@ -8,14 +8,11 @@
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "rootDir": "src",
     "paths": {
       "src/*": ["src/*"],
       "tests/*": ["tests/*"]
-    },
+    }
   },
-  "exclude": [
-    "node_modules",
-    "build",
-    "*.test.ts",
-  ]
+  "exclude": ["node_modules", "build", "**/*.test.ts", "tests"]
 }

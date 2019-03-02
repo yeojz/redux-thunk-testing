@@ -5,10 +5,10 @@
   "main": "./index.js",
   "scripts": {
     "build": "./scripts/build.sh",
-    "build:code": "babel src --out-dir build --extensions \".ts,.tsx\"",
+    "build:code": "babel src --out-dir build --extensions '.ts' --ignore '**/*.test.ts'",
     "build:types": "tsc --emitDeclarationOnly",
     "clean": "rimraf build coverage",
-    "lint:js": "eslint \"src/**/**?(.spec|).js\"",
+    "lint:js": "eslint 'src/**/**?(.spec|).js'",
     "lint:ts": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch"

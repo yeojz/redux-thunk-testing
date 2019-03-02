@@ -1,3 +1,7 @@
+import { FluxStandardAction } from '../src/global';
+
+type Action = FluxStandardAction<any>;
+
 export const actionTypes = {
   ACTION_0: 'ACTION_0',
   ACTION_1: 'ACTION_1',
@@ -22,26 +26,26 @@ export function actionFive() {
   };
 }
 
-export function actionFour() {
+export function actionFour(): Action {
   return {
     type: actionTypes.ACTION_4,
     payload: false
   };
 }
 
-export function actionThree() {
+export function actionThree(): Action {
   return {
     type: actionTypes.ACTION_3,
-    payload: async dispatch => {
+    payload: async (dispatch: Function) => {
       await dispatch(actionSix());
     }
   };
 }
 
-export function actionTwo() {
+export function actionTwo(): Action {
   return {
     type: actionTypes.ACTION_2,
-    payload: async (dispatch, _, extraArgs) => {
+    payload: async (dispatch: Function, _: any, extraArgs: any) => {
       if (extraArgs.four) {
         await dispatch(actionFour());
         return {};
@@ -52,10 +56,10 @@ export function actionTwo() {
   };
 }
 
-export function actionOne() {
+export function actionOne(): Action {
   return {
     type: actionTypes.ACTION_1,
-    payload: async (dispatch, _, extraArgs) => {
+    payload: async (dispatch: Function, _: any, extraArgs: any) => {
       if (extraArgs.two) {
         return extraArgs;
       }
@@ -65,10 +69,10 @@ export function actionOne() {
   };
 }
 
-export function actionZero() {
+export function actionZero(): Action {
   return {
     type: actionTypes.ACTION_0,
-    payload: async (dispatch, _, extraArgs) => {
+    payload: async (dispatch: Function, _: any, extraArgs: any) => {
       if (extraArgs.one) {
         const result = await dispatch(actionOne());
 

@@ -1,3 +1,7 @@
+import { MiddlewareAPI, Dispatch } from 'redux';
+
+let api: MiddlewareAPI<Dispatch, any>;
+
 import {
   standardAsyncMiddleware,
   createStandardAsyncMiddleware
@@ -22,7 +26,7 @@ describe('index', () => {
 
   describe('payload IS NOT a function', () => {
     test('calls next with action AS-IS', () => {
-      standardAsyncMiddleware()(dispatch)(actionNormal);
+      standardAsyncMiddleware(api)(dispatch)(actionNormal);
 
       expect(dispatch.mock.calls.length).toEqual(1);
     });
@@ -30,7 +34,7 @@ describe('index', () => {
 
   describe('payload IS a function', () => {
     test('calls next with action + thunk', () => {
-      standardAsyncMiddleware()(dispatch)(actionFn);
+      standardAsyncMiddleware(api)(dispatch)(actionFn);
 
       expect(dispatch.mock.calls.length).toEqual(2);
       expect(dispatch.mock.calls[1][0]).toEqual(actionFn.payload);
@@ -41,7 +45,7 @@ describe('index', () => {
         dispatchStart: false
       });
 
-      middleware()(dispatch)(actionFn);
+      middleware(api)(dispatch)(actionFn);
 
       expect(dispatch.mock.calls.length).toEqual(1);
       expect(dispatch.mock.calls[0][0]).toEqual(actionFn.payload);

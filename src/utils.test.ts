@@ -1,11 +1,21 @@
-import { actionZero, actionTypes } from '../tests/actions';
-import { JestTester, SimpleTester, getDispatchFlow } from './utils';
+import { actionZero, actionTypes } from '../examples/actions';
+import {
+  JestTester,
+  SimpleTester,
+  getDispatchFlow,
+  ActionTester
+} from './utils';
 
-function runTesterSuite(option) {
-  async function runActionCheck(extraArgs, exepctedResult) {
+interface TestSuite {
+  name: string;
+  getTester(): ActionTester;
+}
+
+function runTesterSuite(option: TestSuite) {
+  async function runActionCheck(extraArgs: any, exepctedResult: Array<string>) {
     const tester = option.getTester();
 
-    tester.setArgs(null, extraArgs);
+    tester.setThunkArgs(null, extraArgs);
     await tester.run(actionZero());
 
     expect(getDispatchFlow(tester)).toEqual(exepctedResult);
