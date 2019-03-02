@@ -8,9 +8,10 @@
     "build:code": "babel src --out-dir build --extensions \".ts,.tsx\"",
     "build:types": "tsc --emitDeclarationOnly",
     "clean": "rimraf build coverage",
+    "lint:js": "eslint \"src/**/**?(.spec|).js\"",
+    "lint:ts": "tsc --noEmit",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "types:check": "tsc --noEmit"
+    "test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
