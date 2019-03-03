@@ -56,13 +56,12 @@ describe('readme-complex', () => {
         }
       }));
 
-      const result = await tester.dispatch(makeSandwichesForEverybody());
+      await tester.dispatch(makeSandwichesForEverybody());
 
       expect(tester.callTypes()).toEqual(['THUNK_ACTION']);
-      expect(result).toEqual('closed');
     });
 
-    test('have enough money to make sandwiches for all', async () => {
+    test.only('have enough money to make sandwiches for all', async () => {
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'grandma');
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'me');
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'wife');
@@ -87,6 +86,36 @@ describe('readme-complex', () => {
         'THUNK_ACTION', // makeASandwichWithSecretSauce('our kids')
         'MAKE_SANDWICH', // makeASandwich('our kids')
         'WITHDRAW' // withdrawMoney
+      ]);
+    });
+
+    test.only('not enough money to make sandwiches for all + no sauce for me', async () => {
+      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'grandma');
+      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
+        throw new Error('oops');
+      });
+      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'wife');
+      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'kids');
+      getState.mockImplementation(() => ({
+        sandwiches: {
+          isShopOpen: true
+        },
+        myMoney: 0
+      }));
+
+      await tester.dispatch(makeSandwichesForEverybody());
+
+      expect(tester.callTypes()).toEqual([
+        'THUNK_ACTION',
+        'THUNK_ACTION',
+        'MAKE_SANDWICH',
+        'THUNK_ACTION',
+        'APOLOGIZE',
+        'THUNK_ACTION',
+        'MAKE_SANDWICH',
+        'THUNK_ACTION',
+        'MAKE_SANDWICH',
+        'APOLOGIZE'
       ]);
     });
   });

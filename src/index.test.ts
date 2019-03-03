@@ -74,6 +74,18 @@ function runTestSuite(getTester: () => ActionTesterInterface) {
     expect(tester.callTypes()).toEqual([THUNK_ACTION, actionTypes.ACTION_6]);
   });
 
+  test('path: thunk -> 6 (use callNumber / callIndex)', async () => {
+    const tester = getTester();
+    tester.setArgs(null, {});
+    await tester.dispatch(actionAnonymous());
+
+    expect(tester.callIndex(0)).toHaveProperty('type', THUNK_ACTION);
+    expect(tester.callNumber(1)).toHaveProperty('type', THUNK_ACTION);
+
+    expect(tester.callIndex(1)).toHaveProperty('type', actionTypes.ACTION_6);
+    expect(tester.callNumber(2)).toHaveProperty('type', actionTypes.ACTION_6);
+  })
+
   test('step: 0 -> 3 -> 6', async () => {
     const tester = getTester();
     tester.setArgs(null, {});

@@ -35,10 +35,8 @@ export function makeASandwichWithSecretSauce(forPerson) {
 
 export function makeSandwichesForEverybody() {
   return async (dispatch, getState) => {
-    const isOpen = getState().sandwiches.isShopOpen;
-
-    if (!isOpen) {
-      return 'closed';
+    if (!getState().sandwiches.isShopOpen) {
+      return;
     }
 
     await dispatch(makeASandwichWithSecretSauce('My Grandma'));
@@ -55,7 +53,5 @@ export function makeSandwichesForEverybody() {
         ? withdrawMoney(42)
         : apologize('Me', 'The Sandwich Shop')
     );
-
-    return 'open';
   };
 }

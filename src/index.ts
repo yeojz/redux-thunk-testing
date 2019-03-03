@@ -61,13 +61,6 @@ export interface ActionTesterInterface {
   readonly calls: CallList;
 
   /**
-   * Resets the state of the mock
-   *
-   * @returns void
-   */
-  reset(): void;
-
-  /**
    * Gets a list containing only the type of dispatched actions
    * in the order in which they were called
    *
@@ -137,10 +130,6 @@ export class ActionTester implements ActionTesterInterface {
   get calls(): CallList {
     return this.callList;
   }
-
-  reset = (): void => {
-    this.callList = [];
-  };
 
   callTypes = (): Array<CallActionType> => {
     return this.calls.map((action: CallAction) => action.type);

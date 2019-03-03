@@ -54,6 +54,9 @@
     "typescript": "^3.3.3333"
   },
   "jest": {
+    "coveragePathIgnorePatterns": [
+      "./tests"
+    ],
     "moduleDirectories": [
       "./node_modules",
       "./src"

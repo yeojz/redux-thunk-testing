@@ -15,12 +15,12 @@
 - [About This Package](#about-this-package)
 - [Installation](#installation)
 - [Examples](#examples)
-  - [Complex](#complex)
   - [Simple](#simple)
+  - [Complex](#complex)
 - [Notes](#notes)
-  - [functions/thunks are all assumed to be `async`](#functionsthunks-are-all-assumed-to-be-async)
+  - [Functions/thunks are all assumed to be async](#functionsthunks-are-all-assumed-to-be-async)
   - [`THUNK_ACTION`](#thunkaction)
-  - [Using thunks as payload of a Flux Standard Action](#using-thunks-as-payload-of-a-flux-standard-action)
+  - [Using thunks as the payload of a Flux Standard Action](#using-thunks-as-the-payload-of-a-flux-standard-action)
 - [License](#license)
 
 <!-- /TOC -->
@@ -51,38 +51,9 @@ npm install redux-thunk-testing --save
 
 ## Examples
 
-### Complex
-
-Tests written for the "make a sandwich" code from the `redux-thunk` [Readme.md][redux-thunk-readme-link]
-There has been slight modification to the example to use async/await.
-
-A copy with some modifications using async/await can be found
-
-The following is just one example. For all tests, refer to
-the [tests/readme-complex][readme-complex] folder.
-
-```js
-test('make a sandwich unsuccessfully', async () => {
-  extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
-    throw new Error('oops');
-  });
-  await tester.dispatch(makeASandwichWithSecretSauce('me'));
-
-  // should call in this order
-  expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'APOLOGIZE']);
-
-  expect(tester.callNumber(2)).toHaveProperty(
-    'fromPerson',
-    'The Sandwich Shop'
-  );
-
-  expect(tester.callNumber(2)).toHaveProperty('toPerson', 'me');
-});
-```
-
 ### Simple
 
-This example can be found at [tests/readme-simple][readme-simple] folder.
+This example can be found at [tests/simple][readme-simple] folder.
 
 File: **actions.js**
 
@@ -128,9 +99,37 @@ test('should dispatch all actions in order', async () => {
 })
 ```
 
+### Complex
+
+The following example is a sample test written for the "make a sandwich" code from
+`redux-thunk` [README.md][redux-thunk-readme-link]. The original code was converted
+to use `async/await`, but otherwise no logic modifications were done to it.
+
+The following is just one example. Refer to [tests/complex][readme-complex] folder
+for more tests
+
+```js
+test('make a sandwich unsuccessfully', async () => {
+  extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
+    throw new Error('oops');
+  });
+  await tester.dispatch(makeASandwichWithSecretSauce('me'));
+
+  // should call in this order
+  expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'APOLOGIZE']);
+
+  expect(tester.callNumber(2)).toHaveProperty(
+    'fromPerson',
+    'The Sandwich Shop'
+  );
+
+  expect(tester.callNumber(2)).toHaveProperty('toPerson', 'me');
+});
+```
+
 ## Notes
 
-### functions/thunks are all assumed to be `async`
+### Functions/thunks are all assumed to be async
 
 All thunks are treated as async methods / returning promises.
 As such, you always call `await` on the dispatch method of the ActionTester.
@@ -158,7 +157,7 @@ store.dispatch({
 });
 ```
 
-### Using thunks as payload of a Flux Standard Action
+### Using thunks as the payload of a Flux Standard Action
 
 If you want to use thunk as the payload of a Flux Standard Action,
 you'll need to add the following middleware.
