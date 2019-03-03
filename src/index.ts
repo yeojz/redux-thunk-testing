@@ -1,13 +1,52 @@
-import { CallAction } from './common';
+import { AnyAction } from 'redux';
 
+/**
+ * Action type for those functions that returns a thunk
+ */
 export const THUNK_ACTION = 'THUNK_ACTION';
 
+/**
+ * An action which has a functional payload (async / non-async)
+ */
+export interface AsyncAction extends AnyAction {
+  payload: Function;
+}
+
+/**
+ * Actions which are accepted in this module
+ */
+export type CallAction = AsyncAction | AnyAction;
+
+/**
+ * A list of actions that were called
+ */
 export type CallList = Array<CallAction>;
-export type CallActionType = string;
+
+/**
+ * jest.fn().mock.calls
+ */
 export type JestCallList = Array<CallList>;
+
+/**
+ * action.type of a dispatched action
+ */
+export type CallActionType = string;
+
+/**
+ * Extra arguments passed to a thunk
+ * i.e. getState + extraArguments
+ */
 export type ThunkArgs = [(Function | null)?, any?];
+
+/**
+ * Accepted results from a dispatched thunk
+ */
 export type DispatchResult = CallAction | Promise<any> | any;
 
+/**
+ * The stepper object that is returned from
+ * calling callStepper
+ */
 export interface CallStepper {
   next(): CallAction | void;
 }
@@ -178,5 +217,7 @@ export class JestActionTester extends ActionTester {
     return Array.isArray(called) ? called[0] : void 0;
   };
 
-  add = (action: CallAction): void => this.jestFn(action);
+  add = (action: CallAction): void => {
+    this.jestFn(action);
+  };
 }
