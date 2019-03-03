@@ -13,8 +13,8 @@
 - [About This Package](#about-this-package)
 - [Installation](#installation)
 - [Examples](#examples)
-  - [Simple](#simple)
-  - [Complex](#complex)
+  - [Simple Example](#simple-example)
+  - [A More Complex Example](#a-more-complex-example)
 - [Notes](#notes)
   - [Functions/thunks are all assumed to be async](#functionsthunks-are-all-assumed-to-be-async)
   - [`THUNK_ACTION`](#thunkaction)
@@ -49,7 +49,7 @@ npm install redux-thunk-testing --save-dev
 
 ## Examples
 
-### Simple
+### Simple Example
 
 This example can be found at [tests/simple][readme-simple] folder.
 
@@ -97,7 +97,7 @@ test('should dispatch all actions in order', async () => {
 })
 ```
 
-### Complex
+### A More Complex Example
 
 The following example is a sample test written for the "make a sandwich" code from
 `redux-thunk` [README.md][redux-thunk-readme-link]. The original code was converted
@@ -161,7 +161,7 @@ If you want to use thunk as the payload of a Flux Standard Action,
 you'll need to add the following middleware.
 
 ```js
-const middleware = () => next => action => {
+const thunkFSA = () => next => action => {
   if (typeof action.payload === 'function') {
      // Convert to a thunk action
     return next(action.payload);
@@ -170,9 +170,14 @@ const middleware = () => next => action => {
 }
 
 // Add it to your redux store.
+import thunk from 'redux-thunk';
+
 const store = createStore(
   rootReducer,
-  applyMiddleware(middleware)
+  applyMiddleware(
+    thunkFSA, // needs to be applied before the thunk
+    thunk
+  )
 );
 ```
 
