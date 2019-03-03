@@ -44,7 +44,7 @@ and provides small utility methods to help with testing.
 Install the library via:
 
 ```bash
-npm install redux-thunk-testing --save
+npm install redux-thunk-testing --save-dev
 ```
 
 ## Examples
