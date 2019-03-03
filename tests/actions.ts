@@ -1,4 +1,4 @@
-import { CallAction } from '../src/common';
+import { CallAction } from '../src';
 
 export const actionTypes = {
   ACTION_0: 'ACTION_0',
