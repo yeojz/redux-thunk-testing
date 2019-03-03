@@ -55,11 +55,31 @@ npm install redux-thunk-testing --save
 #### Complex
 
 Tests written for the "make a sandwich" code from the `redux-thunk` [Readme.md][redux-thunk-readme-link]
-Can be found in the [tests/readme-complex][readme-complex] folder.
-
 There has been slight modification to the example to use async/await.
+
 A copy with some modifications using async/await can be found
 
+The following is just one example. For all tests, refer to
+the [tests/readme-complex][readme-complex] folder.
+
+```js
+test('make a sandwich unsuccessfully', async () => {
+  extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
+    throw new Error('oops');
+  });
+  await tester.dispatch(makeASandwichWithSecretSauce('me'));
+
+  // should call in this order
+  expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'APOLOGIZE']);
+
+  expect(tester.callNumber(2)).toHaveProperty(
+    'fromPerson',
+    'The Sandwich Shop'
+  );
+
+  expect(tester.callNumber(2)).toHaveProperty('toPerson', 'me');
+});
+```
 
 #### Simple
 
@@ -91,6 +111,7 @@ This example can be found at [tests/readme-simple][readme-simple] folder.
 ##### actions.test.js
 
 ```js
+test('should dispatch all actions in order', async () => {
   const tester = new JestTester(jest.fn()) // or new SimpleTester()
   await tester.dispatch(action());
 
@@ -105,6 +126,7 @@ This example can be found at [tests/readme-simple][readme-simple] folder.
   expect(steps.next()).toHaveProperty('type', "ACTION_1");
   expect(steps.next()).toHaveProperty('type', "ACTION_2");
   expect(steps.next()).toBeUndefined();
+})
 ```
 
 ## License
