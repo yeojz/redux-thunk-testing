@@ -12,7 +12,7 @@ export interface CallStepper {
   next(): CallAction | void;
 }
 
-export interface ActionTester {
+export interface ActionTesterInterface {
   /**
    * Gets a list of dispatched actions
    * in the order in which they were called.
@@ -22,21 +22,37 @@ export interface ActionTester {
   readonly calls: CallList;
 
   /**
+   * Resets the state of the mock
+   *
+   * @returns void
+   */
+  reset(): void;
+
+  /**
    * Gets a list containing only the type of dispatched actions
    * in the order in which they were called
    *
    * @returns Array of action.type
    */
-  readonly callTypes: Array<CallActionType>;
+  callTypes(): Array<CallActionType>;
 
   /**
-   * Gets the action at a a particular call position
+   * Gets the action that was called by index
    *
    * @param index - the position of the action which was called.
    * @returns Flux Standard CallAction
    * @returns void
    */
   callIndex(index: number): CallAction | void;
+
+  /**
+   * Gets the action that was called by the number.
+   *
+   * @param num - the order number in which action is called (i.e. index + 1)
+   * @returns Flux Standard CallAction
+   * @returns void
+   */
+  callNumber(num: number): CallAction | void;
 
   /**
    * Gets a faux stepper function to step through the calls
@@ -54,14 +70,13 @@ export interface ActionTester {
   add(action: CallAction): void;
 
   /**
-   * Runs an action and returns the value of the functional payload
-   * or the original action.
+   * Runs an action and runs through the call tree
    *
    * @returns Flux Standard CallAction
    * @returns Promise - for async functions
    * @returns Any basic type
    */
-  run(action: CallAction): CallAction | Promise<any> | any;
+  dispatch(action: CallAction | Function): CallAction | Promise<any> | any;
 
   /**
    * Sets the remaining 2 arguments of a thunk action.
@@ -76,7 +91,7 @@ export interface ActionTester {
 /**
  * A test framework independent ActionTester
  */
-export class SimpleTester implements ActionTester {
+export class ActionTester implements ActionTesterInterface {
   callList: CallList = [];
   thunkArgs: ThunkArgs = [];
 
@@ -84,9 +99,13 @@ export class SimpleTester implements ActionTester {
     return this.callList;
   }
 
-  get callTypes(): Array<CallActionType> {
+  reset = (): void => {
+    this.callList = [];
+  };
+
+  callTypes = (): Array<CallActionType> => {
     return this.calls.map((action: CallAction) => action.type);
-  }
+  };
 
   callStepper = (): CallStepper => {
     let index = 0;
@@ -104,6 +123,10 @@ export class SimpleTester implements ActionTester {
     return this.calls[index];
   };
 
+  callNumber = (num: number): CallAction | void => {
+    return this.callIndex(num - 1);
+  };
+
   setArgs = (getState: Function | null, extraArgument: any): void => {
     this.thunkArgs = [getState, extraArgument];
   };
@@ -112,9 +135,9 @@ export class SimpleTester implements ActionTester {
     this.callList.push(action);
   };
 
-  run = (action: CallAction | Function): DispatchResult => {
+  dispatch = (action: CallAction | Function): DispatchResult => {
     if (typeof action === 'function') {
-      return this.run({
+      return this.dispatch({
         type: THUNK_ACTION,
         payload: action
       });
@@ -123,7 +146,7 @@ export class SimpleTester implements ActionTester {
     this.add(action);
 
     if (typeof action.payload === 'function') {
-      return action.payload(this.run, ...this.thunkArgs);
+      return action.payload(this.dispatch, ...this.thunkArgs);
     }
 
     return action;
@@ -133,27 +156,27 @@ export class SimpleTester implements ActionTester {
 /**
  * Jest compatible ActionTester
  */
-export class JestTester extends SimpleTester {
-  dispatch: any;
+export class JestActionTester extends ActionTester {
+  jestFn: any;
 
   /**
    * Takes in jest mock function
    *
    * @param fn - jest.fn()
    */
-  constructor(fn: any) {
+  constructor(jestFn: any) {
     super();
-    this.dispatch = fn;
+    this.jestFn = jestFn;
   }
 
   get calls(): CallList {
-    return this.dispatch.mock.calls.map((c: JestCallList) => c[0]);
+    return this.jestFn.mock.calls.map((c: JestCallList) => c[0]);
   }
 
   callIndex = (index: number): CallAction | void => {
-    const called = this.dispatch.mock.calls[index];
+    const called = this.jestFn.mock.calls[index];
     return Array.isArray(called) ? called[0] : void 0;
   };
 
-  add = (action: CallAction): void => this.dispatch(action);
+  add = (action: CallAction): void => this.jestFn(action);
 }

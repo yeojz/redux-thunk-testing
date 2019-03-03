@@ -1,14 +1,19 @@
-import { actionZero, actionTypes, actionAnonymous } from '../examples/actions';
-import { JestTester, SimpleTester, THUNK_ACTION } from './index';
+import { actionZero, actionTypes, actionAnonymous } from '../tests/actions';
+import {
+  ActionTesterInterface,
+  JestActionTester,
+  ActionTester,
+  THUNK_ACTION
+} from './index';
 
-function runTestSuite(getTester: Function) {
+function runTestSuite(getTester: () => ActionTesterInterface) {
   async function runCheck(extraArgs: any, expectedResult: Array<string>) {
     const tester = getTester();
 
     tester.setArgs(null, extraArgs);
-    await tester.run(actionZero());
+    await tester.dispatch(actionZero());
 
-    expect(tester.callTypes).toEqual(expectedResult);
+    expect(tester.callTypes()).toEqual(expectedResult);
   }
 
   test('path: 0 -> 3 -> 6', async () => {
@@ -63,34 +68,32 @@ function runTestSuite(getTester: Function) {
 
   test('path: thunk -> 6', async () => {
     const tester = getTester();
-
     tester.setArgs(null, {});
-    await tester.run(actionAnonymous());
+    await tester.dispatch(actionAnonymous());
 
-    expect(tester.callTypes).toEqual([THUNK_ACTION, actionTypes.ACTION_6]);
+    expect(tester.callTypes()).toEqual([THUNK_ACTION, actionTypes.ACTION_6]);
   });
 
   test('step: 0 -> 3 -> 6', async () => {
     const tester = getTester();
-
     tester.setArgs(null, {});
-    await tester.run(actionZero());
+    await tester.dispatch(actionZero());
 
     const steps = tester.callStepper();
 
-    expect(steps.next().type).toEqual(actionTypes.ACTION_0);
-    expect(steps.next().type).toEqual(actionTypes.ACTION_3);
-    expect(steps.next().type).toEqual(actionTypes.ACTION_6);
+    expect(steps.next()).toHaveProperty('type', actionTypes.ACTION_0);
+    expect(steps.next()).toHaveProperty('type', actionTypes.ACTION_3);
+    expect(steps.next()).toHaveProperty('type', actionTypes.ACTION_6);
     expect(steps.next()).toBeUndefined();
   });
 }
 
 describe('utils', () => {
-  describe('SimpleTester', () => {
-    runTestSuite(() => new SimpleTester());
+  describe('ActionTester', () => {
+    runTestSuite(() => new ActionTester());
   });
 
-  describe('JestTester', () => {
-    runTestSuite(() => new JestTester(jest.fn()));
+  describe('JestActionTester', () => {
+    runTestSuite(() => new JestActionTester(jest.fn()));
   });
 });

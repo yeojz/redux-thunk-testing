@@ -11,28 +11,38 @@
 
 <!-- TOC depthFrom:2 -->
 
-- [The problem](#the-problem)
-- [About this package](#about-this-package)
-- [Installation](#installation)
-- [Getting Started](#getting-started)
+- [Motivation](#motivation)
+- [About This Package](#about-this-package)
+- [Usage](#usage)
+  - [Installation](#installation)
+  - [Example](#example)
+    - [Complex](#complex)
+    - [Simple](#simple)
+      - [actions.js](#actionsjs)
+      - [actions.test.js](#actionstestjs)
 - [License](#license)
 
 <!-- /TOC -->
 
-## The problem
+## Motivation
 
-[redux-thunk](https://www.npmjs.com/package/redux-thunk) is a simple middleware
-for async and side-effects logic, and is nearly as ubiquitous as redux itself.
+[redux-thunk][redux-thunk-link] is a simple middleware for async and side-effects logic,
+and is nearly as ubiquitous as redux itself.
 
-However, as we add more complex async actions, it becomes harder and more unwieldy to test.
-There are projects [redux-saga](https://www.npmjs.com/package/redux-saga) which are designed to handle
-such cases, but it might not be a viable option depending on requirements and project at hand.
+However, as we add more complex flows and async actions, it becomes harder and more unwieldy to test.
+There are projects like [redux-saga][redux-saga-link] which are designed to handle
+such cases, but it might not be a viable option depending on requirements and constraints of
+the project at hand.
 
-## About this package
+## About This Package
 
-`redux-thunk-testing` is a utility class for testing these complex thunk actions and their side effects.
+`redux-thunk-testing` is a small utility/wrapper for testing these complex thunk actions and
+their side effects. It runs through the action, executing all the thunks that are found,
+and provides small utility methods to help with testing.
 
-## Installation
+## Usage
+
+### Installation
 
 Install the library via:
 
@@ -40,18 +50,61 @@ Install the library via:
 npm install redux-thunk-testing --save
 ```
 
-## Getting Started
+### Example
+
+#### Complex
+
+Tests written for the "make a sandwich" code from the `redux-thunk` [Readme.md][redux-thunk-readme-link]
+Can be found in the [tests/readme-complex][readme-complex] folder.
+
+There has been slight modification to the example to use async/await.
+A copy with some modifications using async/await can be found
+
+
+#### Simple
+
+This example can be found at [tests/readme-simple][readme-simple] folder.
+
+##### actions.js
 
 ```js
-export function action1() {
-  return {
-    type: "ACTION_1",
-    payload: async (dispatch) => {
-      await dispatch(action2());
-      await dispatch(action3());
+  function action1() {
+    return {
+      type: 'ACTION_1'
     }
-  };
-}
+  }
+
+  function action2() {
+    return {
+      type: 'ACTION_2'
+    }
+  }
+
+  function action() {
+    return (dispatch) => {
+      dispatch(action1())
+      dispatch(action2())
+    }
+  }
+```
+
+##### actions.test.js
+
+```js
+  const tester = new JestTester(jest.fn()) // or new SimpleTester()
+  await tester.dispatch(action());
+
+  // Using bulk checks
+  expect(tester.callTypes()).toEqual([
+    "ACTION_1",
+    "ACTION_2"
+  ]);
+
+  // Using a stepper
+  const steps = tester.callStepper();
+  expect(steps.next()).toHaveProperty('type', "ACTION_1");
+  expect(steps.next()).toHaveProperty('type', "ACTION_2");
+  expect(steps.next()).toBeUndefined();
 ```
 
 ## License
@@ -65,4 +118,10 @@ export function action1() {
 [circle-badge]: https://img.shields.io/circleci/project/github/yeojz/redux-thunk-testing/master.svg?style=flat-square
 [circle-link]: https://circleci.com/gh/yeojz/redux-thunk-testing
 [type-ts-badge]: https://img.shields.io/badge/typedef-.d.ts-blue.svg?style=flat-square&longCache=true
-[type-ts-link]: https://github.com/yeojz/redux-thunk-testing/tree/master/packages/types-ts
+[type-ts-link]: https://github.com/yeojz/redux-thunk-testing/tree/master/src/index.ts
+
+[redux-thunk-link]: https://www.npmjs.com/package/redux-thunk
+[redux-thunk-readme-link]: https://github.com/reduxjs/redux-thunk/blob/d5b6921037ea4ac414e8b6ba3398e4cd6287784c/README.md#Composition
+[redux-sage-link]: https://www.npmjs.com/package/redux-saga
+[readme-simple]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple
+[readme-complex]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex
