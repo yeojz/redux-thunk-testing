@@ -78,15 +78,6 @@ export interface ActionTesterInterface {
   callIndex(index: number): CallAction | void;
 
   /**
-   * Gets the action that was called by the number.
-   *
-   * @param num - the order number in which action is called (i.e. index + 1)
-   * @returns Flux Standard CallAction
-   * @returns void
-   */
-  callNumber(num: number): CallAction | void;
-
-  /**
    * Gets a faux stepper function to step through the calls
    *
    * @returns Object with next() step function
@@ -148,11 +139,10 @@ export class ActionTester implements ActionTesterInterface {
   };
 
   callIndex = (index: number): CallAction | void => {
+    if (index < 0) {
+      return void 0;
+    }
     return this.calls[index];
-  };
-
-  callNumber = (num: number): CallAction | void => {
-    return this.callIndex(num - 1);
   };
 
   setArgs = (getState: Function | null, extraArgument: any): void => {

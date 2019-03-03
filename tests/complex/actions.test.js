@@ -39,12 +39,12 @@ describe('readme-complex', () => {
 
       expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'APOLOGIZE']);
 
-      expect(tester.callNumber(2)).toHaveProperty(
+      expect(tester.callIndex(1)).toHaveProperty(
         'fromPerson',
         'The Sandwich Shop'
       );
 
-      expect(tester.callNumber(2)).toHaveProperty('toPerson', 'me');
+      expect(tester.callIndex(1)).toHaveProperty('toPerson', 'me');
     });
   });
 
@@ -61,7 +61,7 @@ describe('readme-complex', () => {
       expect(tester.callTypes()).toEqual(['THUNK_ACTION']);
     });
 
-    test.only('have enough money to make sandwiches for all', async () => {
+    test('have enough money to make sandwiches for all', async () => {
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'grandma');
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'me');
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'wife');
@@ -89,7 +89,7 @@ describe('readme-complex', () => {
       ]);
     });
 
-    test.only('not enough money to make sandwiches for all + no sauce for me', async () => {
+    test('not enough money to make sandwiches for all + no sauce for me', async () => {
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'grandma');
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
         throw new Error('oops');

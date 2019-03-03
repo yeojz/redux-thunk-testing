@@ -116,12 +116,12 @@ test('make a sandwich unsuccessfully', async () => {
   // should call in this order
   expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'APOLOGIZE']);
 
-  expect(tester.callNumber(2)).toHaveProperty(
+  expect(tester.callIndex(1)).toHaveProperty(
     'fromPerson',
     'The Sandwich Shop'
   );
 
-  expect(tester.callNumber(2)).toHaveProperty('toPerson', 'me');
+  expect(tester.callIndex(1)).toHaveProperty('toPerson', 'me');
 });
 ```
 
