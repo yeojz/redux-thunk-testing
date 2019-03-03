@@ -85,14 +85,6 @@ export interface ActionTesterInterface {
   callStepper(): CallStepper;
 
   /**
-   * Adds to list of dispatched values
-   *
-   * @param action - Flux Standard CallAction
-   * @returns void
-   */
-  add(action: CallAction): void;
-
-  /**
    * Runs an action and runs through the call tree
    *
    * @returns Flux Standard CallAction
@@ -149,10 +141,6 @@ export class ActionTester implements ActionTesterInterface {
     this.thunkArgs = [getState, extraArgument];
   };
 
-  add = (action: CallAction): void => {
-    this.callList.push(action);
-  };
-
   dispatch = (action: CallAction | Function): DispatchResult => {
     if (typeof action === 'function') {
       return this.dispatch({
@@ -168,6 +156,17 @@ export class ActionTester implements ActionTesterInterface {
     }
 
     return action;
+  };
+
+  /**
+   * Adds to list of dispatched values
+   * (internal method)
+   *
+   * @param action - Flux Standard CallAction
+   * @returns void
+   */
+  add = (action: CallAction): void => {
+    this.callList.push(action);
   };
 }
 
