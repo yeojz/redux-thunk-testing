@@ -1,6 +1,6 @@
 {
   "name": "redux-thunk-testing",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": ":nut_and_bolt: Test utility for less painful async thunk testing",
   "main": "./index.js",
   "scripts": {
