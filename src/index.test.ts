@@ -1,5 +1,5 @@
-import { actionZero, actionTypes } from '../examples/actions';
-import { JestTester, SimpleTester } from './index';
+import { actionZero, actionTypes, actionAnonymous } from '../examples/actions';
+import { JestTester, SimpleTester, THUNK_ACTION } from './index';
 
 function runTestSuite(getTester: Function) {
   async function runCheck(extraArgs: any, expectedResult: Array<string>) {
@@ -11,7 +11,7 @@ function runTestSuite(getTester: Function) {
     expect(tester.callTypes).toEqual(expectedResult);
   }
 
-  test('path 0 -> 3 -> 6', async () => {
+  test('path: 0 -> 3 -> 6', async () => {
     await runCheck({}, [
       actionTypes.ACTION_0,
       actionTypes.ACTION_3,
@@ -19,7 +19,7 @@ function runTestSuite(getTester: Function) {
     ]);
   });
 
-  test('path 0 -> 1 -> 4', async () => {
+  test('path: 0 -> 1 -> 4', async () => {
     await runCheck(
       {
         one: true
@@ -28,7 +28,7 @@ function runTestSuite(getTester: Function) {
     );
   });
 
-  test('path 0 -> 1 -> 2 -> 4', async () => {
+  test('path: 0 -> 1 -> 2 -> 4', async () => {
     await runCheck(
       {
         one: true,
@@ -44,7 +44,7 @@ function runTestSuite(getTester: Function) {
     );
   });
 
-  test('path 0 -> 1 -> 2 -> 5 -> 6', async () => {
+  test('path: 0 -> 1 -> 2 -> 5 -> thunk -> 6', async () => {
     await runCheck(
       {
         one: true,
@@ -55,21 +55,33 @@ function runTestSuite(getTester: Function) {
         actionTypes.ACTION_1,
         actionTypes.ACTION_2,
         actionTypes.ACTION_5,
+        THUNK_ACTION,
         actionTypes.ACTION_6
       ]
     );
   });
 
-  test('path 0(silent) -> 3 -> 6 (direct thunk)', async () => {
+  test('path: thunk -> 6', async () => {
     const tester = getTester();
+
     tester.setArgs(null, {});
+    await tester.run(actionAnonymous());
 
-    await tester.runThunk(actionZero().payload);
+    expect(tester.callTypes).toEqual([THUNK_ACTION, actionTypes.ACTION_6]);
+  });
 
-    expect(tester.callTypes).toEqual([
-      actionTypes.ACTION_3,
-      actionTypes.ACTION_6
-    ]);
+  test('step: 0 -> 3 -> 6', async () => {
+    const tester = getTester();
+
+    tester.setArgs(null, {});
+    await tester.run(actionZero());
+
+    const steps = tester.callStepper();
+
+    expect(steps.next().type).toEqual(actionTypes.ACTION_0);
+    expect(steps.next().type).toEqual(actionTypes.ACTION_3);
+    expect(steps.next().type).toEqual(actionTypes.ACTION_6);
+    expect(steps.next()).toBeUndefined();
   });
 }
 

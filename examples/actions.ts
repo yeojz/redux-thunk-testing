@@ -1,6 +1,4 @@
-import { FluxStandardAction } from '../src/common';
-
-type Action = FluxStandardAction<any>;
+import { CallAction } from '../src/common';
 
 export const actionTypes = {
   ACTION_0: 'ACTION_0',
@@ -11,6 +9,12 @@ export const actionTypes = {
   ACTION_5: 'ACTION_5',
   ACTION_6: 'ACTION_6'
 };
+
+export function actionAnonymous() {
+  return (dispatch: Function) => {
+    return dispatch(actionSix());
+  };
+}
 
 export function actionSix() {
   return {
@@ -26,23 +30,23 @@ export function actionFive() {
   };
 }
 
-export function actionFour(): Action {
+export function actionFour(): CallAction {
   return {
     type: actionTypes.ACTION_4,
     payload: false
   };
 }
 
-export function actionThree(): Action {
+export function actionThree(): CallAction {
   return {
     type: actionTypes.ACTION_3,
-    payload: async (dispatch: Function) => {
-      await dispatch(actionSix());
+    payload: (dispatch: Function) => {
+      return dispatch(actionSix());
     }
   };
 }
 
-export function actionTwo(): Action {
+export function actionTwo(): CallAction {
   return {
     type: actionTypes.ACTION_2,
     payload: async (dispatch: Function, _: any, extraArgs: any) => {
@@ -51,12 +55,12 @@ export function actionTwo(): Action {
         return {};
       }
       await dispatch(actionFive());
-      await dispatch(actionSix());
+      await dispatch(actionAnonymous());
     }
   };
 }
 
-export function actionOne(): Action {
+export function actionOne(): CallAction {
   return {
     type: actionTypes.ACTION_1,
     payload: async (dispatch: Function, _: any, extraArgs: any) => {
@@ -69,7 +73,7 @@ export function actionOne(): Action {
   };
 }
 
-export function actionZero(): Action {
+export function actionZero(): CallAction {
   return {
     type: actionTypes.ACTION_0,
     payload: async (dispatch: Function, _: any, extraArgs: any) => {

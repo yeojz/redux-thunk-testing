@@ -1,5 +1,5 @@
 import { Dispatch, Middleware } from 'redux';
-import { AsyncStandardAction, FluxStandardAction } from './common';
+import { CallAction } from './common';
 
 export interface AsyncActionOptions {
   /**
@@ -14,9 +14,7 @@ export function createAsyncActionMiddleware(
 ): Middleware {
   const { dispatchStart = true } = options;
 
-  return () => (next: Dispatch) => (
-    action: AsyncStandardAction | FluxStandardAction<any>
-  ) => {
+  return () => (next: Dispatch) => (action: CallAction) => {
     if (typeof action.payload === 'function') {
       const { payload, ...rest } = action;
 

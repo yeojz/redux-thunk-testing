@@ -1,14 +1,13 @@
-export interface FluxStandardAction<Payload, Meta = undefined> {
-  type: string;
-  payload?: Payload;
-  error?: boolean;
-  meta?: Meta;
+import { AnyAction } from 'redux';
+
+/**
+ * An action which has a functional payload (async / non-async)
+ */
+export interface AsyncAction extends AnyAction {
+  payload: Function
 }
 
 /**
- * Is a type of FSA which has a function payload (async / non-async)
+ * Actions which are accepted in this module
  */
-export type AsyncStandardAction<Meta = undefined> = FluxStandardAction<
-  Function,
-  Meta
->;
+export type CallAction = AsyncAction | AnyAction
