@@ -1,6 +1,6 @@
 # redux-thunk-testing
 
-> Test utilities for less painful async thunk testing
+> Test utility for less painful async thunk testing
 
 [![npm][npm-badge]][npm-link]
 [![Build Status][circle-badge]][circle-link]
@@ -13,13 +13,14 @@
 
 - [Motivation](#motivation)
 - [About This Package](#about-this-package)
-- [Usage](#usage)
-  - [Installation](#installation)
-  - [Example](#example)
-    - [Complex](#complex)
-    - [Simple](#simple)
-      - [actions.js](#actionsjs)
-      - [actions.test.js](#actionstestjs)
+- [Installation](#installation)
+- [Examples](#examples)
+  - [Complex](#complex)
+  - [Simple](#simple)
+- [Notes](#notes)
+  - [functions/thunks are all assumed to be `async`](#functionsthunks-are-all-assumed-to-be-async)
+  - [`THUNK_ACTION`](#thunkaction)
+  - [Using thunks as payload of a Flux Standard Action](#using-thunks-as-payload-of-a-flux-standard-action)
 - [License](#license)
 
 <!-- /TOC -->
@@ -40,9 +41,7 @@ the project at hand.
 their side effects. It runs through the action, executing all the thunks that are found,
 and provides small utility methods to help with testing.
 
-## Usage
-
-### Installation
+## Installation
 
 Install the library via:
 
@@ -50,9 +49,9 @@ Install the library via:
 npm install redux-thunk-testing --save
 ```
 
-### Example
+## Examples
 
-#### Complex
+### Complex
 
 Tests written for the "make a sandwich" code from the `redux-thunk` [Readme.md][redux-thunk-readme-link]
 There has been slight modification to the example to use async/await.
@@ -81,11 +80,11 @@ test('make a sandwich unsuccessfully', async () => {
 });
 ```
 
-#### Simple
+### Simple
 
 This example can be found at [tests/readme-simple][readme-simple] folder.
 
-##### actions.js
+File: **actions.js**
 
 ```js
   function action1() {
@@ -108,7 +107,7 @@ This example can be found at [tests/readme-simple][readme-simple] folder.
   }
 ```
 
-##### actions.test.js
+File: **actions.test.js**
 
 ```js
 test('should dispatch all actions in order', async () => {
@@ -127,6 +126,57 @@ test('should dispatch all actions in order', async () => {
   expect(steps.next()).toHaveProperty('type', "ACTION_2");
   expect(steps.next()).toBeUndefined();
 })
+```
+
+## Notes
+
+### functions/thunks are all assumed to be `async`
+
+All thunks are treated as async methods / returning promises.
+As such, you always call `await` on the dispatch method of the ActionTester.
+
+i.e. `await tester.dispatch(action())`
+
+### `THUNK_ACTION`
+
+This `action.type` is logged when the action being dispatched is a function an not
+as a functional payload of a "Flux Standard Action"
+
+```js
+// Given
+async function thunk(dispatch, getState, extraArgs) {
+  // code ...
+}
+
+// THUNK_ACTION
+store.dispatch(thunk);
+
+// Functional payload of a "Flux Standard Action"
+store.dispatch({
+  type: 'SOME_ACTION',
+  payload: thunk
+});
+```
+
+### Using thunks as payload of a Flux Standard Action
+
+If you want to use thunk as the payload of a Flux Standard Action,
+you'll need to add the following middleware.
+
+```js
+const middleware = () => next => action => {
+  if (typeof action.payload === 'function') {
+     // Convert to a thunk action
+    return next(action.payload);
+  }
+   return next(action);
+}
+
+// Add it to your redux store.
+const store = createStore(
+  rootReducer,
+  applyMiddleware(middleware)
+);
 ```
 
 ## License
