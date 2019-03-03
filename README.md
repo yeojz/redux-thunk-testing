@@ -3,8 +3,6 @@
 > Test utility for less painful async thunk testing
 
 [![npm][npm-badge]][npm-link]
-[![Build Status][circle-badge]][circle-link]
-[![npm downloads][npm-downloads-badge]][npm-link]
 [![TypeScript Support][type-ts-badge]][type-ts-link]
 
 ---
