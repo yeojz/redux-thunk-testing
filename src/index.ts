@@ -68,11 +68,6 @@ export interface IActionStore {
 }
 
 /**
- * Acceptable responses from a thunk
- */
-export type ThunkResponse = TestAction | Promise<unknown> | unknown;
-
-/**
  * Normalizes actions
  * converts thunks to actions with thunk payloads
  *
@@ -157,15 +152,15 @@ export function createActionRunner(
    * Recursively calls the action and executes the thunk
    *
    * @param action TestAction | Function
-   * @returns TestAction | Promise<unknown> | unknown
+   * @returns Promise<unknown>
    */
-  function actionRunner(action: TestAction | Function): ThunkResponse {
+  async function actionRunner(action: TestAction | Function): Promise<unknown> {
     const normalised = actionNormalizer(action);
 
     tester.add(normalised);
 
     if (typeof normalised.payload === 'function') {
-      return normalised.payload(actionRunner, ...thunkArgs);
+      return await normalised.payload(actionRunner, ...thunkArgs);
     }
 
     return normalised;
@@ -244,9 +239,9 @@ export class ActionTester implements IActionStore {
    * dispatches an action and runs through the call tree
    *
    * @param action TestAction | Function
-   * @returns TestAction | Promise<unknown> | unknown
+   * @returns Promise<unknown>
    */
-  dispatch = (action: TestAction | Function): ThunkResponse => {
+  dispatch = async (action: TestAction | Function): Promise<unknown> => {
     const runner = createActionRunner(this, ...this.thunkArgs);
     return runner(action);
   };
