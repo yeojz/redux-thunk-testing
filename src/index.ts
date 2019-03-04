@@ -15,22 +15,7 @@ export interface AsyncAction extends AnyAction {
 /**
  * Actions which are accepted in this module
  */
-export type CallAction = AsyncAction | AnyAction;
-
-/**
- * A list of actions that were called
- */
-export type CallList = Array<CallAction>;
-
-/**
- * jest.fn().mock.calls
- */
-export type JestCallList = Array<CallList>;
-
-/**
- * action.type of a dispatched action
- */
-export type CallActionType = string;
+export type TestAction = AsyncAction | AnyAction;
 
 /**
  * Extra arguments passed to a thunk
@@ -39,59 +24,210 @@ export type CallActionType = string;
 export type ThunkArgs = [(Function | null)?, any?];
 
 /**
- * Accepted results from a dispatched thunk
+ * A list of actions that were called
  */
-export type DispatchResult = CallAction | Promise<any> | any;
+export type CallList = Array<TestAction>;
 
 /**
- * The stepper object that is returned from
- * calling callStepper
+ * jest.fn().mock.calls
  */
-export interface CallStepper {
-  next(): CallAction | void;
+export type JestCallList = Array<CallList>;
+
+/**
+ * An action tracer that allows you
+ * to step through action one by one.
+ */
+export interface IActionTracer {
+  current(): TestAction | void;
+  next(): TestAction | void;
+  prev(): TestAction | void;
 }
 
-export interface ActionTesterInterface {
-  /**
-   * Gets a list of dispatched actions
-   * in the order in which they were called.
-   *
-   * @returns Array of Flux Standard Actions
-   */
+/**
+ * Store for calls
+ */
+export interface IActionStore {
   readonly calls: CallList;
-
-  /**
-   * Gets a list containing only the type of dispatched actions
-   * in the order in which they were called
-   *
-   * @returns Array of action.type
-   */
-  callTypes(): Array<CallActionType>;
 
   /**
    * Gets the action that was called by index
    *
    * @param index - the position of the action which was called.
-   * @returns Flux Standard CallAction
+   * @returns TestAction | void
+   */
+  index(index: number): TestAction | void;
+
+  /**
+   * Adds to list of dispatched values
+   * (internal method)
+   *
+   * @param action TestAction
    * @returns void
    */
-  callIndex(index: number): CallAction | void;
+  add(action: TestAction): unknown;
+}
 
-  /**
-   * Gets a faux stepper function to step through the calls
-   *
-   * @returns Object with next() step function
-   */
-  callStepper(): CallStepper;
+/**
+ * Acceptable responses from a thunk
+ */
+export type ThunkResponse = TestAction | Promise<unknown> | unknown;
 
+/**
+ * Normalizes actions
+ * converts thunks to actions with thunk payloads
+ *
+ * @param action Function
+ * @return TestAction
+ */
+export function actionNormalizer(action: TestAction | Function): TestAction {
+  if (typeof action === 'function') {
+    return {
+      type: THUNK_ACTION,
+      payload: action
+    };
+  }
+
+  return action;
+}
+
+/**
+ * Alias for actionNormalizer
+ */
+export const actionNormaliser = actionNormalizer;
+
+/**
+ * Snapshots an action for comparison
+ *
+ * @param action TestAction | Function
+ * @returns TestAction
+ */
+export function actionSnapshot(action: TestAction | Function): TestAction {
+  if (typeof action === 'function') {
+    return {
+      type: THUNK_ACTION,
+      payload: '[FUNCTION]'
+    };
+  }
+
+  if (typeof action.payload === 'function') {
+    return {
+      ...action,
+      payload: '[FUNCTION]'
+    };
+  }
+
+  return action;
+}
+
+/**
+ * Generates an array of snapshots from a list of actions
+ *
+ * @param actions Array<TestAction>
+ * @returns Array<TestAction>
+ */
+export function actionArraySnapshot(
+  actions: Array<TestAction | Function>
+): Array<TestAction> {
+  return actions.map(c => actionSnapshot(c));
+}
+
+/**
+ * Generates an array of snapshots from the action tester
+ *
+ * @param tester IActionStore
+ * @returns Array<TestAction>
+ */
+export function actionTesterSnapshot(tester: IActionStore): Array<TestAction> {
+  return actionArraySnapshot(tester.calls);
+}
+
+/**
+ * Creates an action runner
+ *
+ * @param tester IActionStore
+ * @param thunkArgs getState + extraArguments
+ * @returns Function
+ */
+export function createActionRunner(
+  tester: IActionStore,
+  ...thunkArgs: ThunkArgs
+) {
   /**
-   * Runs an action and runs through the call tree
+   * The action runner.
+   * Recursively calls the action and executes the thunk
    *
-   * @returns Flux Standard CallAction
-   * @returns Promise - for async functions
-   * @returns Any basic type
+   * @param action TestAction | Function
+   * @returns TestAction | Promise<unknown> | unknown
    */
-  dispatch(action: CallAction | Function): CallAction | Promise<any> | any;
+  function actionRunner(action: TestAction | Function): ThunkResponse {
+    const normalised = actionNormalizer(action);
+
+    tester.add(normalised);
+
+    if (typeof normalised.payload === 'function') {
+      return normalised.payload(actionRunner, ...thunkArgs);
+    }
+
+    return normalised;
+  }
+
+  return actionRunner;
+}
+
+/**
+ * Gets as current(), prev(), next() step methods for stepping through
+ * the called actions
+ *
+ * @param tester IActionStore
+ * @returns IActionTracer
+ */
+export function actionTracer(tester: IActionStore): IActionTracer {
+  let index = -1;
+
+  return {
+    current: () => tester.index(index),
+    next: () => {
+      index = index + 1;
+      return tester.index(index);
+    },
+    prev: () => {
+      index = index - 1;
+      return tester.index(index);
+    }
+  };
+}
+
+/**
+ * Gets a list of action.type that were called.
+ *
+ * @param tester - IActionStore
+ * @returns Array<string>
+ */
+export function actionTypes(tester: IActionStore): Array<string> {
+  return tester.calls.map((action: TestAction) => action.type);
+}
+
+/**
+ * A test-framework independent utility
+ */
+export class ActionTester implements IActionStore {
+  callList: CallList = [];
+  thunkArgs: ThunkArgs = [];
+
+  get calls(): CallList {
+    return this.callList;
+  }
+
+  add = (action: TestAction): void => {
+    this.callList.push(action);
+  };
+
+  index = (index: number): TestAction | void => {
+    if (index < 0) {
+      return void 0;
+    }
+    return this.calls[index];
+  };
 
   /**
    * Sets the remaining 2 arguments of a thunk action.
@@ -100,73 +236,43 @@ export interface ActionTesterInterface {
    * @param extraArgument - Mock values injected via thunk.withExtraArgument
    * @returns void
    */
-  setArgs(getState: Function | null, extraArgument: any): void;
-}
-
-/**
- * A test framework independent ActionTester
- */
-export class ActionTester implements ActionTesterInterface {
-  callList: CallList = [];
-  thunkArgs: ThunkArgs = [];
-
-  get calls(): CallList {
-    return this.callList;
-  }
-
-  callTypes = (): Array<CallActionType> => {
-    return this.calls.map((action: CallAction) => action.type);
-  };
-
-  callStepper = (): CallStepper => {
-    let index = 0;
-
-    return {
-      next: () => {
-        const current = this.callIndex(index);
-        index = index + 1;
-        return current;
-      }
-    };
-  };
-
-  callIndex = (index: number): CallAction | void => {
-    if (index < 0) {
-      return void 0;
-    }
-    return this.calls[index];
-  };
-
   setArgs = (getState: Function | null, extraArgument: any): void => {
     this.thunkArgs = [getState, extraArgument];
   };
 
-  dispatch = (action: CallAction | Function): DispatchResult => {
-    if (typeof action === 'function') {
-      return this.dispatch({
-        type: THUNK_ACTION,
-        payload: action
-      });
-    }
-
-    this.add(action);
-
-    if (typeof action.payload === 'function') {
-      return action.payload(this.dispatch, ...this.thunkArgs);
-    }
-
-    return action;
+  /**
+   * dispatches an action and runs through the call tree
+   *
+   * @param action TestAction | Function
+   * @returns TestAction | Promise<unknown> | unknown
+   */
+  dispatch = (action: TestAction | Function): ThunkResponse => {
+    const runner = createActionRunner(this, ...this.thunkArgs);
+    return runner(action);
   };
 
   /**
-   * Adds to list of dispatched values
-   * (internal method)
+   * Gets a list containing only the type of dispatched actions
+   * in the order in which they were called
    *
-   * @param action - Flux Standard CallAction
-   * @returns void
+   * @returns Array<string>
    */
-  add = (action: CallAction): void => {
-    this.callList.push(action);
+  toTypes = (): Array<string> => actionTypes(this);
+
+  /**
+   * Gets a faux tracer/stepper function to step through the calls
+   *
+   * @returns IActionTracer
+   */
+  toTracer = (): IActionTracer => actionTracer(this);
+
+  /**
+   * Generates a snapshot of actions dispatched
+   *
+   * @returns Array<TestAction>
+   */
+  toSnapshot = (): Array<TestAction> => {
+    return actionTesterSnapshot(this);
   };
 }
 
@@ -179,7 +285,7 @@ export class JestActionTester extends ActionTester {
   /**
    * Takes in jest mock function
    *
-   * @param fn - jest.fn()
+   * @param jestFn jest.fn()
    */
   constructor(jestFn: any) {
     super();
@@ -190,12 +296,12 @@ export class JestActionTester extends ActionTester {
     return this.jestFn.mock.calls.map((c: JestCallList) => c[0]);
   }
 
-  callIndex = (index: number): CallAction | void => {
+  index = (index: number): TestAction | void => {
     const called = this.jestFn.mock.calls[index];
     return Array.isArray(called) ? called[0] : void 0;
   };
 
-  add = (action: CallAction): void => {
+  add = (action: TestAction): void => {
     this.jestFn(action);
   };
 }

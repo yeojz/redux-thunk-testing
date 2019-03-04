@@ -1,11 +1,14 @@
-import { JestActionTester } from '../../src';
+import { JestActionTester, actionArraySnapshot } from '../../src';
 
 import {
   makeSandwichesForEverybody,
-  makeASandwichWithSecretSauce
+  makeASandwichWithSecretSauce,
+  makeASandwich,
+  withdrawMoney,
+  apologize
 } from './actions';
 
-describe('readme-complex', () => {
+describe('complex', () => {
   let tester;
 
   const getState = jest.fn();
@@ -28,7 +31,7 @@ describe('readme-complex', () => {
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'ok sauce');
       await tester.dispatch(makeASandwichWithSecretSauce('me'));
 
-      expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'MAKE_SANDWICH']);
+      expect(tester.toTypes()).toEqual(['THUNK_ACTION', 'MAKE_SANDWICH']);
     });
 
     test('make a sandwich unsuccessfully', async () => {
@@ -36,15 +39,12 @@ describe('readme-complex', () => {
         throw new Error('oops');
       });
       await tester.dispatch(makeASandwichWithSecretSauce('me'));
+      const steps = tester.toTracer();
 
-      expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'APOLOGIZE']);
+      steps.next(); // skipping one
 
-      expect(tester.callIndex(1)).toHaveProperty(
-        'fromPerson',
-        'The Sandwich Shop'
-      );
-
-      expect(tester.callIndex(1)).toHaveProperty('toPerson', 'me');
+      expect(steps.next()).toHaveProperty('fromPerson', 'The Sandwich Shop');
+      expect(steps.current()).toHaveProperty('toPerson', 'me');
     });
   });
 
@@ -58,14 +58,13 @@ describe('readme-complex', () => {
 
       await tester.dispatch(makeSandwichesForEverybody());
 
-      expect(tester.callTypes()).toEqual(['THUNK_ACTION']);
+      const expected = actionArraySnapshot([makeSandwichesForEverybody()]);
+
+      expect(tester.toSnapshot()).toEqual(expected);
     });
 
     test('have enough money to make sandwiches for all', async () => {
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'grandma');
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'me');
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'wife');
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'kids');
+      extraArgs.api.fetchSecretSauce.mockImplementation(() => 'sauce');
       getState.mockImplementation(() => ({
         sandwiches: {
           isShopOpen: true
@@ -75,48 +74,59 @@ describe('readme-complex', () => {
 
       await tester.dispatch(makeSandwichesForEverybody());
 
-      expect(tester.callTypes()).toEqual([
-        'THUNK_ACTION', // makeSandwichesForEverybody
-        'THUNK_ACTION', // makeASandwichWithSecretSauce('My Grandma')
-        'MAKE_SANDWICH', // makeASandwich('My Grandma')
-        'THUNK_ACTION', // makeASandwichWithSecretSauce('Me'))
-        'THUNK_ACTION', // makeASandwichWithSecretSauce('My wife')
-        'MAKE_SANDWICH', // makeASandwich('Me')
-        'MAKE_SANDWICH', // makeASandwich('My wife')
-        'THUNK_ACTION', // makeASandwichWithSecretSauce('our kids')
-        'MAKE_SANDWICH', // makeASandwich('our kids')
-        'WITHDRAW' // withdrawMoney
+      const expected = actionArraySnapshot([
+        makeSandwichesForEverybody(),
+        makeASandwichWithSecretSauce('My Grandma'),
+        makeASandwich('My Grandma', 'sauce'),
+        makeASandwichWithSecretSauce('Me'),
+        makeASandwichWithSecretSauce('My wife'),
+        makeASandwich('Me', 'sauce'),
+        makeASandwich('My wife', 'sauce'),
+        makeASandwichWithSecretSauce('Our kids'),
+        makeASandwich('Our kids', 'sauce'),
+        withdrawMoney(42)
       ]);
+
+      expect(tester.toSnapshot()).toEqual(expected);
     });
 
     test('not enough money to make sandwiches for all + no sauce for me', async () => {
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'grandma');
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
-        throw new Error('oops');
-      });
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'wife');
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'kids');
-      getState.mockImplementation(() => ({
-        sandwiches: {
-          isShopOpen: true
-        },
-        myMoney: 0
-      }));
+      const err = new Error('oops');
+      // Running setup twice because we're mocking each implementation once.
+      // thus we need it for actionArraySnapshot();
+      function setup() {
+        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'grandma');
+        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
+          throw err;
+        });
+        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'wife');
+        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'kids');
+        getState.mockImplementation(() => ({
+          sandwiches: {
+            isShopOpen: true
+          },
+          myMoney: 0
+        }));
+      }
 
+      setup();
       await tester.dispatch(makeSandwichesForEverybody());
 
-      expect(tester.callTypes()).toEqual([
-        'THUNK_ACTION',
-        'THUNK_ACTION',
-        'MAKE_SANDWICH',
-        'THUNK_ACTION',
-        'APOLOGIZE',
-        'THUNK_ACTION',
-        'MAKE_SANDWICH',
-        'THUNK_ACTION',
-        'MAKE_SANDWICH',
-        'APOLOGIZE'
+      setup();
+      const expected = actionArraySnapshot([
+        makeSandwichesForEverybody(),
+        makeASandwichWithSecretSauce('My Grandma'),
+        makeASandwich('My Grandma', 'grandma'),
+        makeASandwichWithSecretSauce('Me'),
+        apologize('The Sandwich Shop', 'Me', err),
+        makeASandwichWithSecretSauce('My wife'),
+        makeASandwich('My wife', 'wife'),
+        makeASandwichWithSecretSauce('Our kids'),
+        makeASandwich('Our kids', 'kids'),
+        apologize('Me', 'The Sandwich Shop')
       ]);
+
+      expect(tester.toSnapshot()).toEqual(expected);
     });
   });
 });

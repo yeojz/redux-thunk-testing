@@ -1,6 +1,6 @@
 # redux-thunk-testing
 
-> Test utility for less painful async thunk testing
+> Test utility for less painful async thunk testing / snapshot testing
 
 [![npm][npm-badge]][npm-link]
 [![TypeScript Support][type-ts-badge]][type-ts-link]
@@ -11,10 +11,10 @@
 
 - [Motivation](#motivation)
 - [About This Package](#about-this-package)
+- [Features](#features)
 - [Installation](#installation)
 - [Examples](#examples)
-  - [Simple Example](#simple-example)
-  - [A More Complex Example](#a-more-complex-example)
+  - [About code in tests/complex](#about-code-in-testscomplex)
 - [Notes](#notes)
   - [Functions/thunks are all assumed to be async](#functionsthunks-are-all-assumed-to-be-async)
   - [`THUNK_ACTION`](#thunkaction)
@@ -39,6 +39,13 @@ the project at hand.
 their side effects. It runs through the action, executing all the thunks that are found,
 and provides small utility methods to help with testing.
 
+## Features
+
+- **Snapshot Testing**
+- Supports thunk.withExtraArgument
+- Supports flux standard actions with a thunk function
+- TypeScript support ([definition file](https://unpkg.com/redux-thunk-testing/index.d.ts))
+
 ## Installation
 
 Install the library via:
@@ -49,79 +56,44 @@ npm install redux-thunk-testing --save-dev
 
 ## Examples
 
-### Simple Example
+- [src/index.test.ts][index-test-ts]
+- [tests/simple][example-simple]
+- [tests/complex][example-complex]
 
-This example can be found at [tests/simple][readme-simple] folder.
+### About code in tests/complex
 
-File: **actions.js**
-
-```js
-  function action1() {
-    return {
-      type: 'ACTION_1'
-    }
-  }
-
-  function action2() {
-    return {
-      type: 'ACTION_2'
-    }
-  }
-
-  function action() {
-    return (dispatch) => {
-      dispatch(action1())
-      dispatch(action2())
-    }
-  }
-```
-
-File: **actions.test.js**
-
-```js
-test('should dispatch all actions in order', async () => {
-  const tester = new JestTester(jest.fn()) // or new SimpleTester()
-  await tester.dispatch(action());
-
-  // Using bulk checks
-  expect(tester.callTypes()).toEqual([
-    "ACTION_1",
-    "ACTION_2"
-  ]);
-
-  // Using a stepper
-  const steps = tester.callStepper();
-  expect(steps.next()).toHaveProperty('type', "ACTION_1");
-  expect(steps.next()).toHaveProperty('type', "ACTION_2");
-  expect(steps.next()).toBeUndefined();
-})
-```
-
-### A More Complex Example
-
-The following example is a sample test written for the "make a sandwich" code from
+These are sample tests written for the "make a sandwich" code from
 `redux-thunk` [README.md][redux-thunk-readme-link]. The original code was converted
 to use `async/await`, but otherwise no logic modifications were done to it.
 
-The following is just one example. Refer to [tests/complex][readme-complex] folder
-for more tests
+**Snippet:**
 
 ```js
-test('make a sandwich unsuccessfully', async () => {
-  extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
-    throw new Error('oops');
-  });
-  await tester.dispatch(makeASandwichWithSecretSauce('me'));
+test('have enough money to make sandwiches for all', async () => {
+  extraArgs.api.fetchSecretSauce.mockImplementation(() => 'sauce');
+  getState.mockImplementation(() => ({
+    sandwiches: {
+      isShopOpen: true
+    },
+    myMoney: 100
+  }));
 
-  // should call in this order
-  expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'APOLOGIZE']);
+  await tester.dispatch(makeSandwichesForEverybody());
 
-  expect(tester.callIndex(1)).toHaveProperty(
-    'fromPerson',
-    'The Sandwich Shop'
-  );
+  const expected = actionArraySnapshot([
+    makeSandwichesForEverybody(),
+    makeASandwichWithSecretSauce('My Grandma'),
+    makeASandwich('My Grandma', 'sauce'),
+    makeASandwichWithSecretSauce('Me'),
+    makeASandwichWithSecretSauce('My wife'),
+    makeASandwich('Me', 'sauce'),
+    makeASandwich('My wife', 'sauce'),
+    makeASandwichWithSecretSauce('Our kids'),
+    makeASandwich('Our kids', 'sauce'),
+    withdrawMoney(42)
+  ]);
 
-  expect(tester.callIndex(1)).toHaveProperty('toPerson', 'me');
+  expect(tester.toSnapshot()).toEqual(expected);
 });
 ```
 
@@ -129,8 +101,8 @@ test('make a sandwich unsuccessfully', async () => {
 
 ### Functions/thunks are all assumed to be async
 
-All thunks are treated as async methods / returning promises.
-As such, you always call `await` on the dispatch method of the ActionTester.
+All thunks are treated as `async` methods / returning `promises`.
+As such, you should always call `await` on the dispatch method of the ActionTester.
 
 i.e. `await tester.dispatch(action())`
 
@@ -141,18 +113,18 @@ as a functional payload of a "Flux Standard Action"
 
 ```js
 // Given
-async function thunk(dispatch, getState, extraArgs) {
+const action = () => async (dispatch, getState, extraArgs) => {
   // code ...
 }
 
-// THUNK_ACTION
-store.dispatch(thunk);
+// testing for when
+store.dispatch(action());
 
-// Functional payload of a "Flux Standard Action"
+// will result in (within the test suite)
 store.dispatch({
-  type: 'SOME_ACTION',
-  payload: thunk
-});
+  type: 'THUNK_ACTION',
+  payload: action()
+})
 ```
 
 ### Using thunks as the payload of a Flux Standard Action
@@ -197,5 +169,6 @@ const store = createStore(
 [redux-thunk-link]: https://www.npmjs.com/package/redux-thunk
 [redux-thunk-readme-link]: https://github.com/reduxjs/redux-thunk/blob/d5b6921037ea4ac414e8b6ba3398e4cd6287784c/README.md#Composition
 [redux-sage-link]: https://www.npmjs.com/package/redux-saga
-[readme-simple]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple
-[readme-complex]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex
+[example-simple]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple
+[example-complex]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex
+[index-test-ts]: https://github.com/yeojz/redux-thunk-testing/blob/master/src/index.test.ts

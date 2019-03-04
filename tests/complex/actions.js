@@ -1,4 +1,4 @@
-function makeASandwich(forPerson, secretSauce) {
+export function makeASandwich(forPerson, secretSauce) {
   return {
     type: 'MAKE_SANDWICH',
     forPerson,
@@ -6,7 +6,7 @@ function makeASandwich(forPerson, secretSauce) {
   };
 }
 
-function apologize(fromPerson, toPerson, error) {
+export function apologize(fromPerson, toPerson, error) {
   return {
     type: 'APOLOGIZE',
     fromPerson,
@@ -15,7 +15,7 @@ function apologize(fromPerson, toPerson, error) {
   };
 }
 
-function withdrawMoney(amount) {
+export function withdrawMoney(amount) {
   return {
     type: 'WITHDRAW',
     amount
