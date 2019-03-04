@@ -87,7 +87,22 @@ describe('complex', () => {
         withdrawMoney(42)
       ]);
 
+      // Snapshot Testing
       expect(tester.toSnapshot()).toEqual(expected);
+
+      // Alternatively, just check the types
+      expect(tester.toTypes()).toEqual([
+        'THUNK_ACTION',
+        'THUNK_ACTION',
+        'MAKE_SANDWICH',
+        'THUNK_ACTION',
+        'THUNK_ACTION',
+        'MAKE_SANDWICH',
+        'MAKE_SANDWICH',
+        'THUNK_ACTION',
+        'MAKE_SANDWICH',
+        'WITHDRAW'
+      ]);
     });
 
     test('not enough money to make sandwiches for all + no sauce for me', async () => {
@@ -126,7 +141,22 @@ describe('complex', () => {
         apologize('Me', 'The Sandwich Shop')
       ]);
 
+      // Snapshot Testing
       expect(tester.toSnapshot()).toEqual(expected);
+
+      // Alternatively, just check the types
+      expect(tester.toTypes()).toEqual([
+        'THUNK_ACTION',
+        'THUNK_ACTION',
+        'MAKE_SANDWICH',
+        'THUNK_ACTION',
+        'APOLOGIZE',
+        'THUNK_ACTION',
+        'MAKE_SANDWICH',
+        'THUNK_ACTION',
+        'MAKE_SANDWICH',
+        'APOLOGIZE'
+      ]);
     });
   });
 });

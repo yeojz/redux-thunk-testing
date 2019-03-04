@@ -3,6 +3,7 @@
 > Test utility for less painful async thunk testing / snapshot testing
 
 [![npm][npm-badge]][npm-link]
+[![Build Status][circle-badge]][circle-link]
 [![TypeScript Support][type-ts-badge]][type-ts-link]
 
 ---
@@ -93,7 +94,22 @@ test('have enough money to make sandwiches for all', async () => {
     withdrawMoney(42)
   ]);
 
+  // Snapshot Testing
   expect(tester.toSnapshot()).toEqual(expected);
+
+  // Alternatively, just check the types
+  expect(tester.toTypes()).toEqual([
+    'THUNK_ACTION',
+    'THUNK_ACTION',
+    'MAKE_SANDWICH',
+    'THUNK_ACTION',
+    'THUNK_ACTION',
+    'MAKE_SANDWICH',
+    'MAKE_SANDWICH',
+    'THUNK_ACTION',
+    'MAKE_SANDWICH',
+    'WITHDRAW'
+  ]);
 });
 ```
 
