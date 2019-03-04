@@ -28,7 +28,7 @@ describe('readme-complex', () => {
       extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'ok sauce');
       await tester.dispatch(makeASandwichWithSecretSauce('me'));
 
-      expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'MAKE_SANDWICH']);
+      expect(tester.toTypes()).toEqual(['THUNK_ACTION', 'MAKE_SANDWICH']);
     });
 
     test('make a sandwich unsuccessfully', async () => {
@@ -37,14 +37,10 @@ describe('readme-complex', () => {
       });
       await tester.dispatch(makeASandwichWithSecretSauce('me'));
 
-      expect(tester.callTypes()).toEqual(['THUNK_ACTION', 'APOLOGIZE']);
+      expect(tester.toTypes()).toEqual(['THUNK_ACTION', 'APOLOGIZE']);
 
-      expect(tester.callIndex(1)).toHaveProperty(
-        'fromPerson',
-        'The Sandwich Shop'
-      );
-
-      expect(tester.callIndex(1)).toHaveProperty('toPerson', 'me');
+      expect(tester.index(1)).toHaveProperty('fromPerson', 'The Sandwich Shop');
+      expect(tester.index(1)).toHaveProperty('toPerson', 'me');
     });
   });
 
@@ -58,7 +54,7 @@ describe('readme-complex', () => {
 
       await tester.dispatch(makeSandwichesForEverybody());
 
-      expect(tester.callTypes()).toEqual(['THUNK_ACTION']);
+      expect(tester.toTypes()).toEqual(['THUNK_ACTION']);
     });
 
     test('have enough money to make sandwiches for all', async () => {
@@ -75,7 +71,7 @@ describe('readme-complex', () => {
 
       await tester.dispatch(makeSandwichesForEverybody());
 
-      expect(tester.callTypes()).toEqual([
+      expect(tester.toTypes()).toEqual([
         'THUNK_ACTION', // makeSandwichesForEverybody
         'THUNK_ACTION', // makeASandwichWithSecretSauce('My Grandma')
         'MAKE_SANDWICH', // makeASandwich('My Grandma')
@@ -105,7 +101,7 @@ describe('readme-complex', () => {
 
       await tester.dispatch(makeSandwichesForEverybody());
 
-      expect(tester.callTypes()).toEqual([
+      expect(tester.toTypes()).toEqual([
         'THUNK_ACTION',
         'THUNK_ACTION',
         'MAKE_SANDWICH',

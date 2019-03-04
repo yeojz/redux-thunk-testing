@@ -1,6 +1,6 @@
 # redux-thunk-testing
 
-> Test utility for less painful async thunk testing
+> Test utility for less painful async thunk testing / snapshot testing
 
 [![npm][npm-badge]][npm-link]
 [![TypeScript Support][type-ts-badge]][type-ts-link]
@@ -11,6 +11,7 @@
 
 - [Motivation](#motivation)
 - [About This Package](#about-this-package)
+- [Features](#features)
 - [Installation](#installation)
 - [Examples](#examples)
   - [Simple Example](#simple-example)
@@ -38,6 +39,12 @@ the project at hand.
 `redux-thunk-testing` is a small utility/wrapper for testing these complex thunk actions and
 their side effects. It runs through the action, executing all the thunks that are found,
 and provides small utility methods to help with testing.
+
+## Features
+
+- **Snapshot Testing**
+- Supports thunk.withExtraArgument
+- Supports flux standard actions with a thunk function
 
 ## Installation
 
@@ -79,22 +86,30 @@ File: **actions.js**
 File: **actions.test.js**
 
 ```js
-test('should dispatch all actions in order', async () => {
   const tester = new JestTester(jest.fn()) // or new SimpleTester()
   await tester.dispatch(action());
 
+  // Snapshot Testing
+  const expected = actionArraySnapshot([
+    action(),
+    action1(),
+    action2()
+  ]);
+  expect(tester.toSnapshot()).toEqual(expected);
+
   // Using bulk checks
-  expect(tester.callTypes()).toEqual([
+  expect(tester.toTypes()).toEqual([
+    "THUNK_ACTION",
     "ACTION_1",
     "ACTION_2"
   ]);
 
   // Using a stepper
-  const steps = tester.callStepper();
+  const steps = tester.toTracer();
+  expect(steps.next()).toHaveProperty('type', "THUNK_ACTION");
   expect(steps.next()).toHaveProperty('type', "ACTION_1");
   expect(steps.next()).toHaveProperty('type', "ACTION_2");
   expect(steps.next()).toBeUndefined();
-})
 ```
 
 ### A More Complex Example
@@ -107,7 +122,6 @@ The following is just one example. Refer to [tests/complex][readme-complex] fold
 for more tests
 
 ```js
-test('make a sandwich unsuccessfully', async () => {
   extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
     throw new Error('oops');
   });
@@ -122,7 +136,6 @@ test('make a sandwich unsuccessfully', async () => {
   );
 
   expect(tester.callIndex(1)).toHaveProperty('toPerson', 'me');
-});
 ```
 
 ## Notes

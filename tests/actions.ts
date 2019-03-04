@@ -1,4 +1,4 @@
-import { CallAction } from '../src';
+import { TestAction } from '../src';
 
 export const actionTypes = {
   ACTION_0: 'ACTION_0',
@@ -30,14 +30,14 @@ export function actionFive() {
   };
 }
 
-export function actionFour(): CallAction {
+export function actionFour(): TestAction {
   return {
     type: actionTypes.ACTION_4,
     payload: false
   };
 }
 
-export function actionThree(): CallAction {
+export function actionThree(): TestAction {
   return {
     type: actionTypes.ACTION_3,
     payload: (dispatch: Function) => {
@@ -46,7 +46,7 @@ export function actionThree(): CallAction {
   };
 }
 
-export function actionTwo(): CallAction {
+export function actionTwo(): TestAction {
   return {
     type: actionTypes.ACTION_2,
     payload: async (dispatch: Function, _: any, extraArgs: any) => {
@@ -60,7 +60,7 @@ export function actionTwo(): CallAction {
   };
 }
 
-export function actionOne(): CallAction {
+export function actionOne(): TestAction {
   return {
     type: actionTypes.ACTION_1,
     payload: async (dispatch: Function, _: any, extraArgs: any) => {
@@ -73,7 +73,7 @@ export function actionOne(): CallAction {
   };
 }
 
-export function actionZero(): CallAction {
+export function actionZero(): TestAction {
   return {
     type: actionTypes.ACTION_0,
     payload: async (dispatch: Function, _: any, extraArgs: any) => {
@@ -87,7 +87,7 @@ export function actionZero(): CallAction {
         return;
       }
 
-      return dispatch(actionThree());
+      return await dispatch(actionThree());
     }
   };
 }
