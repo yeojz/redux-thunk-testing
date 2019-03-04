@@ -1,7 +1,7 @@
 import { action, action1, action2 } from './actions';
 import { JestActionTester, actionArraySnapshot } from '../../src';
 
-describe('readme-simple', () => {
+describe('simple', () => {
   async function getTester() {
     const tester = new JestActionTester(jest.fn()); // or new SimpleTester()
     await tester.dispatch(action());
