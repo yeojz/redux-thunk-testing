@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`complex makeSandwichesForEverybody have enough money to make sandwiches for all 1`] = `
+Array [
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "forPerson": "My Grandma",
+    "secretSauce": "sauce",
+    "type": "MAKE_SANDWICH",
+  },
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "forPerson": "Me",
+    "secretSauce": "sauce",
+    "type": "MAKE_SANDWICH",
+  },
+  Object {
+    "forPerson": "My wife",
+    "secretSauce": "sauce",
+    "type": "MAKE_SANDWICH",
+  },
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "forPerson": "Our kids",
+    "secretSauce": "sauce",
+    "type": "MAKE_SANDWICH",
+  },
+  Object {
+    "amount": 42,
+    "type": "WITHDRAW",
+  },
+]
+`;
+
+exports[`complex makeSandwichesForEverybody not enough money to make sandwiches for all + no sauce for me 1`] = `
+Array [
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "forPerson": "My Grandma",
+    "secretSauce": "grandma",
+    "type": "MAKE_SANDWICH",
+  },
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "error": "oops",
+    "fromPerson": "The Sandwich Shop",
+    "toPerson": "Me",
+    "type": "APOLOGIZE",
+  },
+  Object {
+    "forPerson": "My wife",
+    "secretSauce": "wife",
+    "type": "MAKE_SANDWICH",
+  },
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "forPerson": "Our kids",
+    "secretSauce": "kids",
+    "type": "MAKE_SANDWICH",
+  },
+  Object {
+    "error": undefined,
+    "fromPerson": "Me",
+    "toPerson": "The Sandwich Shop",
+    "type": "APOLOGIZE",
+  },
+]
+`;

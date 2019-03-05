@@ -9,7 +9,8 @@ import {
   ActionTester,
   JestActionTester,
   THUNK_ACTION,
-  actionArraySnapshot
+  actionArraySnapshot,
+  convertGenericToSnapshot
 } from './index';
 
 function runTestSuite(getTester: () => ActionTester) {
@@ -137,12 +138,34 @@ function runTestSuite(getTester: () => ActionTester) {
   });
 }
 
-describe('utils', () => {
+describe('index', () => {
   describe('ActionTester', () => {
     runTestSuite(() => new ActionTester());
   });
 
   describe('JestActionTester', () => {
     runTestSuite(() => new JestActionTester(jest.fn()));
+  });
+
+  describe('convertGenericToSnapshot', () => {
+    const action = [
+      {
+        type: 'A1',
+        payload: () => null
+      },
+      {
+        type: 'B1',
+        payload: {
+          b2: [1, true, 'something', () => null],
+          b3: {
+            1: 'val1',
+            '2': 'val2',
+            '3': 3
+          }
+        }
+      }
+    ];
+
+    expect(convertGenericToSnapshot(action)).toMatchSnapshot();
   });
 });

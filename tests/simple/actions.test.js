@@ -27,6 +27,12 @@ describe('simple', () => {
   test('using snapshot', async () => {
     const tester = await getTester();
 
+    // Using Jest Snapshot
+    expect(tester.toSnapshot()).toMatchSnapshot();
+
+    // Snapshot Testing
+    // Generating our own inline snapshot with
+    // expected function calls
     const expected = actionArraySnapshot([action(), action1(), action2()]);
 
     expect(tester.toSnapshot()).toEqual(expected);

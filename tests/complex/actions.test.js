@@ -28,16 +28,18 @@ describe('complex', () => {
 
   describe('makeASandwichWithSecretSauce', () => {
     test('make a sandwich successfully', async () => {
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'ok sauce');
+      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() =>
+        Promise.resolve('ok sauce')
+      );
       await tester.dispatch(makeASandwichWithSecretSauce('me'));
 
       expect(tester.toTypes()).toEqual(['THUNK_ACTION', 'MAKE_SANDWICH']);
     });
 
     test('make a sandwich unsuccessfully', async () => {
-      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
-        throw new Error('oops');
-      });
+      extraArgs.api.fetchSecretSauce.mockImplementationOnce(() =>
+        Promise.reject(new Error('oops'))
+      );
       await tester.dispatch(makeASandwichWithSecretSauce('me'));
       const steps = tester.toTracer();
 
@@ -64,7 +66,9 @@ describe('complex', () => {
     });
 
     test('have enough money to make sandwiches for all', async () => {
-      extraArgs.api.fetchSecretSauce.mockImplementation(() => 'sauce');
+      extraArgs.api.fetchSecretSauce.mockImplementation(() =>
+        Promise.resolve('sauce')
+      );
       getState.mockImplementation(() => ({
         sandwiches: {
           isShopOpen: true
@@ -74,6 +78,11 @@ describe('complex', () => {
 
       await tester.dispatch(makeSandwichesForEverybody());
 
+      // Using Jest snapshot
+      expect(tester.toSnapshot()).toMatchSnapshot();
+
+      // Generating our own inline snapshot with
+      // expected function calls
       const expected = actionArraySnapshot([
         makeSandwichesForEverybody(),
         makeASandwichWithSecretSauce('My Grandma'),
@@ -110,12 +119,18 @@ describe('complex', () => {
       // Running setup twice because we're mocking each implementation once.
       // thus we need it for actionArraySnapshot();
       function setup() {
-        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'grandma');
-        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => {
-          throw err;
-        });
-        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'wife');
-        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() => 'kids');
+        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() =>
+          Promise.resolve('grandma')
+        );
+        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() =>
+          Promise.reject(err)
+        );
+        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() =>
+          Promise.resolve('wife')
+        );
+        extraArgs.api.fetchSecretSauce.mockImplementationOnce(() =>
+          Promise.resolve('kids')
+        );
         getState.mockImplementation(() => ({
           sandwiches: {
             isShopOpen: true
@@ -127,21 +142,26 @@ describe('complex', () => {
       setup();
       await tester.dispatch(makeSandwichesForEverybody());
 
+      // Using Jest Snapshot
+      expect(tester.toSnapshot()).toMatchSnapshot();
+
+      // Snapshot Testing
+      // Generating our own inline snapshot with
+      // expected function calls
       setup();
       const expected = actionArraySnapshot([
         makeSandwichesForEverybody(),
         makeASandwichWithSecretSauce('My Grandma'),
         makeASandwich('My Grandma', 'grandma'),
         makeASandwichWithSecretSauce('Me'),
-        apologize('The Sandwich Shop', 'Me', err),
         makeASandwichWithSecretSauce('My wife'),
+        apologize('The Sandwich Shop', 'Me', err),
         makeASandwich('My wife', 'wife'),
         makeASandwichWithSecretSauce('Our kids'),
         makeASandwich('Our kids', 'kids'),
         apologize('Me', 'The Sandwich Shop')
       ]);
 
-      // Snapshot Testing
       expect(tester.toSnapshot()).toEqual(expected);
 
       // Alternatively, just check the types
@@ -150,8 +170,8 @@ describe('complex', () => {
         'THUNK_ACTION',
         'MAKE_SANDWICH',
         'THUNK_ACTION',
-        'APOLOGIZE',
         'THUNK_ACTION',
+        'APOLOGIZE',
         'MAKE_SANDWICH',
         'THUNK_ACTION',
         'MAKE_SANDWICH',

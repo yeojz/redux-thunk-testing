@@ -17,9 +17,9 @@
 - [Examples](#examples)
   - [About code in tests/complex](#about-code-in-testscomplex)
 - [Notes](#notes)
-  - [Functions/thunks are all assumed to be async](#functionsthunks-are-all-assumed-to-be-async)
+  - [Thunks are assumed to be async](#thunks-are-assumed-to-be-async)
   - [`THUNK_ACTION`](#thunkaction)
-  - [Using thunks as the payload of a Flux Standard Action](#using-thunks-as-the-payload-of-a-flux-standard-action)
+  - [Flux Standard Action with Thunk payload](#flux-standard-action-with-thunk-payload)
 - [License](#license)
 
 <!-- /TOC -->
@@ -29,22 +29,27 @@
 [redux-thunk][redux-thunk-link] is a simple middleware for async and side-effects logic,
 and is nearly as ubiquitous as redux itself.
 
-However, as we add more complex flows and async actions, it becomes harder and more unwieldy to test.
-There are projects like [redux-saga][redux-saga-link] which are designed to handle
-such cases, but it might not be a viable option depending on requirements and constraints of
-the project at hand.
+However, as more complex flows and async actions are added, it becomes harder and more unwieldy to test.
+Some projects like [redux-saga][redux-saga-link] were created to help handle such issues.
+
+That aside, there might be situations where using such projects might not be a viable option due
+to constraints and requirements of the project.
 
 ## About This Package
 
-`redux-thunk-testing` is a small utility/wrapper for testing these complex thunk actions and
-their side effects. It runs through the action, executing all the thunks that are found,
-and provides small utility methods to help with testing.
+`redux-thunk-testing` is a small utility/wrapper which aims to help testing complex thunk actions and
+their side effects easily. Conceptually, it runs through the action, executing all the thunks that
+are found, and subsequently provides utilities around the results for testing.
 
 ## Features
 
-- **Snapshot Testing**
-- Supports thunk.withExtraArgument
-- Supports flux standard actions with a thunk function
+- Supports **Snapshot Testing**
+- Test framework agnostic.
+  - Provides `ActionTester` which can be used on it's own.
+  - Provides `JestActionTester` for usage with `jest.fn()`
+- Supports `thunk.withExtraArgument`
+  - For more info about extraArguments, check out: [here][redux-thunk-with-extra-arg] and [here][medium-thunk-with-extra-arg]
+- Supports `flux standard actions` with a thunk function as payload. [see notes](#flux-standard-action-with-thunk-payload)
 - TypeScript support ([definition file](https://unpkg.com/redux-thunk-testing/index.d.ts))
 
 ## Installation
@@ -63,15 +68,33 @@ npm install redux-thunk-testing --save-dev
 
 ### About code in tests/complex
 
-These are sample tests written for the "make a sandwich" code from
-`redux-thunk` [README.md][redux-thunk-readme-link]. The original code was converted
-to use `async/await`, but otherwise no logic modifications were done to it.
+These are sample tests written for the "make a sandwich" code example from
+`redux-thunk` [README.md][redux-thunk-readme-link]. A copy of the example
+has been copied over.
+
+**Small change:** instead of declaring `fetchSecretSauce()`, this is assumed
+to be injected as an extraArgument to a thunk.
 
 **Snippet:**
 
 ```js
 test('have enough money to make sandwiches for all', async () => {
-  extraArgs.api.fetchSecretSauce.mockImplementation(() => 'sauce');
+  // Setup tester + other thunk paramters
+  // It is highly recommended to use thunk.withExtraArguments to inject
+  // your dependencies. It makes testing much easier.
+  const tester = new JestActionTester(jest.fn());
+  // Or const tester = new ActionTester(); if you're not using jest.
+
+  const getState = jest.fn();
+  const extraArgs = {
+    api: {
+      fetchSecretSauce: jest.fn()
+    }
+  };
+  tester.setArgs(getState, extraArgs);
+
+  // Mocking the return values of api etc.
+  extraArgs.api.fetchSecretSauce.mockImplementation(() => Promise.resolve('sauce'));
   getState.mockImplementation(() => ({
     sandwiches: {
       isShopOpen: true
@@ -79,8 +102,15 @@ test('have enough money to make sandwiches for all', async () => {
     myMoney: 100
   }));
 
+  // Dispatch the action
   await tester.dispatch(makeSandwichesForEverybody());
 
+  // Using Jest Snapshot
+  expect(tester.toSnapshot()).toMatchSnapshot();
+
+  // Snapshot Testing
+  // Generating our own inline snapshot with
+  // expected function calls
   const expected = actionArraySnapshot([
     makeSandwichesForEverybody(),
     makeASandwichWithSecretSauce('My Grandma'),
@@ -94,7 +124,6 @@ test('have enough money to make sandwiches for all', async () => {
     withdrawMoney(42)
   ]);
 
-  // Snapshot Testing
   expect(tester.toSnapshot()).toEqual(expected);
 
   // Alternatively, just check the types
@@ -115,12 +144,16 @@ test('have enough money to make sandwiches for all', async () => {
 
 ## Notes
 
-### Functions/thunks are all assumed to be async
+### Thunks are assumed to be async
 
 All thunks are treated as `async` methods / returning `promises`.
-As such, you should always call `await` on the dispatch method of the ActionTester.
+As such, you should always call `await` or `Promise.resolve` when
+dispatching the action with ActionTester.
 
-i.e. `await tester.dispatch(action())`
+i.e. `await tester.dispatch(action())` or `Promise.resolve(tester.dispatch(action()))`
+
+Even if you're returning a basic type (eg: `boolean`, `string`), the parser will
+still call it with `async` / `Promise.resolve`
 
 ### `THUNK_ACTION`
 
@@ -133,23 +166,49 @@ const action = () => async (dispatch, getState, extraArgs) => {
   // code ...
 }
 
-// testing for when
-store.dispatch(action());
+// when testing
+tester.dispatch(action());
 
-// will result in (within the test suite)
-store.dispatch({
+// will resolve to (within the test suite)
+tester.dispatch({
   type: 'THUNK_ACTION',
   payload: action()
 })
 ```
 
-### Using thunks as the payload of a Flux Standard Action
+### Flux Standard Action with Thunk payload
 
-If you want to use thunk as the payload of a Flux Standard Action,
-you'll need to add the following middleware.
+p.s: **This is optional**
+
+If you don't want to see "THUNK_ACTION" in your tests, you
+might want to consider dispatching FSA with a thunk payload.
+
+i.e.
 
 ```js
-const thunkFSA = () => next => action => {
+// Instead of
+function action() {
+  return dispatch => {
+    // code
+  }
+}
+
+// Try
+function action() {
+  return {
+    type: "NAMED_ACTION",
+    payload: dispatch => {
+      // code
+    }
+  }
+}
+
+```
+
+However, in order to do the above, you'll need the following middleware.
+
+```js
+const fsaThunk = () => next => action => {
   if (typeof action.payload === 'function') {
      // Convert to a thunk action
     return next(action.payload);
@@ -163,7 +222,7 @@ import thunk from 'redux-thunk';
 const store = createStore(
   rootReducer,
   applyMiddleware(
-    thunkFSA, // needs to be applied before the thunk
+    fsaThunk, // needs to be applied before the thunk
     thunk
   )
 );
@@ -188,3 +247,6 @@ const store = createStore(
 [example-simple]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple
 [example-complex]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex
 [index-test-ts]: https://github.com/yeojz/redux-thunk-testing/blob/master/src/index.test.ts
+
+[redux-thunk-with-extra-arg]: https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument
+[medium-thunk-with-extra-arg]: https://medium.com/@yeojz/redux-thunk-skipping-mocks-using-withextraargument-513d38d38554
