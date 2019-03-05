@@ -14,6 +14,7 @@
 - [About This Package](#about-this-package)
 - [Features](#features)
 - [Installation](#installation)
+- [Documentation](#documentation)
 - [Examples](#examples)
   - [About code in tests/complex](#about-code-in-testscomplex)
 - [Notes](#notes)
@@ -59,6 +60,10 @@ Install the library via:
 ```bash
 npm install redux-thunk-testing --save-dev
 ```
+
+## Documentation
+
+- [Link to Documentation][project-docs]
 
 ## Examples
 
@@ -250,3 +255,4 @@ const store = createStore(
 
 [redux-thunk-with-extra-arg]: https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument
 [medium-thunk-with-extra-arg]: https://medium.com/@yeojz/redux-thunk-skipping-mocks-using-withextraargument-513d38d38554
+[project-docs]: https://yeojz.github.io/redux-thunk-testing
