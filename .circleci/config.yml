@@ -128,6 +128,29 @@ jobs:
     <<: *defaults
     <<: *npm_publish
 
+  deploy_website:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore-cache: *restore_release_cache
+      - run: *install_npm
+      - save_cache: *save_release_cache
+      - run:
+          name: configure git user
+          command: |
+            git config --global user.email $PROJECT_DEPLOY_EMAIL
+            git config --global user.name $PROJECT_DEPLOY_NAME
+      - run:
+          working_directory: ~/project/site
+          name: deploying website
+          command: |
+            if [[ $CIRCLE_PROJECT_USERNAME == $PROJECT_OWNER_NAME && -z $CI_PULL_REQUEST && -z $CIRCLE_PR_USERNAME ]]; then
+              npm install
+              npm run build:docs
+              npm run deploy
+            else
+              echo "skipping deploy."
+            fi
 
 workflows:
   version: 2
@@ -143,6 +166,11 @@ workflows:
           filters: *filter_tag_all
       - node_v10:
           filters: *filter_tag_all
+      - deploy_website:
+          requires:
+            - node_v8
+            - node_v10
+          filters: *filter_tag_stable
       - publish_npm_beta:
           requires:
             - node_v8
