@@ -4,6 +4,7 @@
 
 [![npm][npm-badge]][npm-link]
 [![Build Status][circle-badge]][circle-link]
+[![Coverage Status][codecov-badge]][codecov-link]
 [![TypeScript Support][type-ts-badge]][type-ts-link]
 
 ---
@@ -245,6 +246,8 @@ const store = createStore(
 [circle-link]: https://circleci.com/gh/yeojz/redux-thunk-testing
 [type-ts-badge]: https://img.shields.io/badge/typedef-.d.ts-blue.svg?style=flat-square&longCache=true
 [type-ts-link]: https://github.com/yeojz/redux-thunk-testing/tree/master/src/index.ts
+[codecov-badge]: https://img.shields.io/codecov/c/github/yeojz/redux-thunk-testing/master.svg?style=flat-square
+[codecov-link]: https://codecov.io/gh/yeojz/redux-thunk-testing
 
 [redux-thunk-link]: https://www.npmjs.com/package/redux-thunk
 [redux-thunk-readme-link]: https://github.com/reduxjs/redux-thunk/blob/d5b6921037ea4ac414e8b6ba3398e4cd6287784c/README.md#Composition
