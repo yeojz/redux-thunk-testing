@@ -6,6 +6,17 @@ import { AnyAction } from 'redux';
 export const THUNK_ACTION = 'THUNK_ACTION';
 
 /**
+ * Function tag
+ * Used when replacing functions in a snapshot
+ */
+export const FUNCTION_TAG = '[Function]';
+
+export interface AnyObject {
+  [keys: string]: unknown;
+  [keys: number]: unknown;
+}
+
+/**
  * An action which has a functional payload (async / non-async)
  */
 export interface AsyncAction extends AnyAction {
@@ -91,6 +102,44 @@ export function actionNormalizer(action: TestAction | Function): TestAction {
 export const actionNormaliser = actionNormalizer;
 
 /**
+ * Deep converts an object into a snapshot friendly structure
+ *
+ * @param value object
+ * @returns object
+ */
+export function convertObjectToSnapshot(value: AnyObject): AnyObject {
+  return Object.getOwnPropertyNames(value).reduce(
+    (collect: AnyObject, key: keyof AnyObject): AnyObject => ({
+      ...collect,
+      [key]: convertGenericToSnapshot(value[key])
+    }),
+    <AnyObject>{}
+  );
+}
+
+/**
+ * Deep converts a generic value into a snapshot friendly structure
+ *
+ * @param value any basic types
+ * @returns any basic types
+ */
+export function convertGenericToSnapshot(value: unknown): unknown {
+  if (typeof value === 'function') {
+    return FUNCTION_TAG;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(convertGenericToSnapshot);
+  }
+
+  if (typeof value === 'object' && value != null) {
+    return convertObjectToSnapshot(<AnyObject>value);
+  }
+
+  return value;
+}
+
+/**
  * Snapshots an action for comparison
  *
  * @param action TestAction | Function
@@ -100,18 +149,11 @@ export function actionSnapshot(action: TestAction | Function): TestAction {
   if (typeof action === 'function') {
     return {
       type: THUNK_ACTION,
-      payload: '[FUNCTION]'
+      payload: FUNCTION_TAG
     };
   }
 
-  if (typeof action.payload === 'function') {
-    return {
-      ...action,
-      payload: '[FUNCTION]'
-    };
-  }
-
-  return action;
+  return <TestAction>convertGenericToSnapshot(action);
 }
 
 /**

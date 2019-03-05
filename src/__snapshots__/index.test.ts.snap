@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[` 1`] = `
+Array [
+  Object {
+    "payload": "[Function]",
+    "type": "A1",
+  },
+  Object {
+    "payload": Object {
+      "b2": Array [
+        1,
+        true,
+        "something",
+        "[Function]",
+      ],
+      "b3": Object {
+        "1": "val1",
+        "2": "val2",
+        "3": 3,
+      },
+    },
+    "type": "B1",
+  },
+]
+`;

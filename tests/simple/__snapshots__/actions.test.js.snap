@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`simple using snapshot 1`] = `
+Array [
+  Object {
+    "payload": "[Function]",
+    "type": "THUNK_ACTION",
+  },
+  Object {
+    "type": "ACTION_1",
+  },
+  Object {
+    "type": "ACTION_2",
+  },
+]
+`;

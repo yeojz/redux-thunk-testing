@@ -11,7 +11,7 @@ export function apologize(fromPerson, toPerson, error) {
     type: 'APOLOGIZE',
     fromPerson,
     toPerson,
-    error
+    error: error ? error.message : error
   };
 }
 
@@ -23,35 +23,36 @@ export function withdrawMoney(amount) {
 }
 
 export function makeASandwichWithSecretSauce(forPerson) {
-  return async (dispatch, _, { api }) => {
-    try {
-      const sauce = await api.fetchSecretSauce();
-      dispatch(makeASandwich(forPerson, sauce));
-    } catch (error) {
-      dispatch(apologize('The Sandwich Shop', forPerson, error));
-    }
+  return function(dispatch, _, { api }) {
+    return api
+      .fetchSecretSauce()
+      .then(
+        sauce => dispatch(makeASandwich(forPerson, sauce)),
+        error => dispatch(apologize('The Sandwich Shop', forPerson, error))
+      );
   };
 }
 
 export function makeSandwichesForEverybody() {
-  return async (dispatch, getState) => {
+  return function(dispatch, getState) {
     if (!getState().sandwiches.isShopOpen) {
-      return;
+      return Promise.resolve();
     }
 
-    await dispatch(makeASandwichWithSecretSauce('My Grandma'));
-
-    await Promise.all([
-      dispatch(makeASandwichWithSecretSauce('Me')),
-      dispatch(makeASandwichWithSecretSauce('My wife'))
-    ]);
-
-    await dispatch(makeASandwichWithSecretSauce('Our kids'));
-
-    await dispatch(
-      getState().myMoney > 42
-        ? withdrawMoney(42)
-        : apologize('Me', 'The Sandwich Shop')
-    );
+    return dispatch(makeASandwichWithSecretSauce('My Grandma'))
+      .then(() =>
+        Promise.all([
+          dispatch(makeASandwichWithSecretSauce('Me')),
+          dispatch(makeASandwichWithSecretSauce('My wife'))
+        ])
+      )
+      .then(() => dispatch(makeASandwichWithSecretSauce('Our kids')))
+      .then(() =>
+        dispatch(
+          getState().myMoney > 42
+            ? withdrawMoney(42)
+            : apologize('Me', 'The Sandwich Shop')
+        )
+      );
   };
 }
