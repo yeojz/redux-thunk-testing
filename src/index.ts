@@ -55,6 +55,17 @@ export interface IActionTracer {
 }
 
 /**
+ * The action runner takes an action and recursively
+ * calls any thunks with an action runner.
+ *
+ * @param action TestAction | Function
+ * @returns Promise<unknown>
+ */
+export interface IActionRunner {
+  (action: TestAction | Function): Promise<unknown>
+};
+
+/**
  * Store for calls
  */
 export interface IActionStore {
@@ -79,8 +90,7 @@ export interface IActionStore {
 }
 
 /**
- * Normalizes actions
- * converts thunks to actions with thunk payloads
+ * Converts thunks to actions with thunk payloads
  *
  * @param action Function
  * @return TestAction
@@ -140,7 +150,7 @@ export function convertGenericToSnapshot(value: unknown): unknown {
 }
 
 /**
- * Snapshots an action for comparison
+ * Creates a snapshot object for an action.
  *
  * @param action TestAction | Function
  * @returns TestAction
@@ -157,7 +167,7 @@ export function actionSnapshot(action: TestAction | Function): TestAction {
 }
 
 /**
- * Generates an array of snapshots from a list of actions
+ * Creates an array of snapshot objects for the list of actions.
  *
  * @param actions Array<TestAction>
  * @returns Array<TestAction>
@@ -169,7 +179,7 @@ export function actionArraySnapshot(
 }
 
 /**
- * Generates an array of snapshots from the action tester
+ * Generates an array of snapshots from an IActionStore compatible tester.
  *
  * @param tester IActionStore
  * @returns Array<TestAction>
@@ -179,7 +189,7 @@ export function actionTesterSnapshot(tester: IActionStore): Array<TestAction> {
 }
 
 /**
- * Creates an action runner
+ * Creates an action runner.
  *
  * @param tester IActionStore
  * @param thunkArgs getState + extraArguments
@@ -188,14 +198,7 @@ export function actionTesterSnapshot(tester: IActionStore): Array<TestAction> {
 export function createActionRunner(
   tester: IActionStore,
   ...thunkArgs: ThunkArgs
-) {
-  /**
-   * The action runner.
-   * Recursively calls the action and executes the thunk
-   *
-   * @param action TestAction | Function
-   * @returns Promise<unknown>
-   */
+): IActionRunner {
   async function actionRunner(action: TestAction | Function): Promise<unknown> {
     const normalised = actionNormalizer(action);
 
@@ -212,8 +215,8 @@ export function createActionRunner(
 }
 
 /**
- * Gets as current(), prev(), next() step methods for stepping through
- * the called actions
+ * Gets an object with step methods for stepping through
+ * the called actions.
  *
  * @param tester IActionStore
  * @returns IActionTracer
@@ -245,7 +248,7 @@ export function actionTypes(tester: IActionStore): Array<string> {
 }
 
 /**
- * A test-framework independent utility
+ * A test-framework independent test runner class
  */
 export class ActionTester implements IActionStore {
   callList: CallList = [];
@@ -278,7 +281,7 @@ export class ActionTester implements IActionStore {
   };
 
   /**
-   * dispatches an action and runs through the call tree
+   * Dispatches an action and runs through the call tree.
    *
    * @param action TestAction | Function
    * @returns Promise<unknown>
@@ -290,21 +293,21 @@ export class ActionTester implements IActionStore {
 
   /**
    * Gets a list containing only the type of dispatched actions
-   * in the order in which they were called
+   * in the order in which they were called.
    *
    * @returns Array<string>
    */
   toTypes = (): Array<string> => actionTypes(this);
 
   /**
-   * Gets a faux tracer/stepper function to step through the calls
+   * Gets a object containing step functions to step through the calls.
    *
    * @returns IActionTracer
    */
   toTracer = (): IActionTracer => actionTracer(this);
 
   /**
-   * Generates a snapshot of actions dispatched
+   * Generates a snapshot of actions dispatched.
    *
    * @returns Array<TestAction>
    */
@@ -314,13 +317,13 @@ export class ActionTester implements IActionStore {
 }
 
 /**
- * Jest compatible ActionTester
+ * A jest compatible test runner class
  */
 export class JestActionTester extends ActionTester {
   jestFn: any;
 
   /**
-   * Takes in jest mock function
+   * Takes in jest mock function.
    *
    * @param jestFn jest.fn()
    */

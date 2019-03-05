@@ -24,3 +24,5 @@ yarn-error.log*
 
 public/scripts/**/*.js
 public/scripts/**/*.js.map
+
+/docs

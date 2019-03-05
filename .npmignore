@@ -25,3 +25,5 @@ src
 tests
 webpack.config.js
 examples
+
+/docs

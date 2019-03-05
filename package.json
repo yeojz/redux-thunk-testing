@@ -6,6 +6,7 @@
   "scripts": {
     "build": "./build.sh",
     "build:code": "babel src --out-dir build --extensions '.ts' --ignore '**/*.test.ts'",
+    "build:docs": "typedoc src",
     "build:types": "tsc --emitDeclarationOnly",
     "clean": "rimraf build coverage",
     "lint:js": "eslint 'src/**/**?(.spec|).js'",
@@ -51,6 +52,7 @@
     "prettier": "^1.16.4",
     "redux": "^4.0.1",
     "rimraf": "^2.6.3",
+    "typedoc": "^0.14.2",
     "typescript": "^3.3.3333"
   },
   "jest": {
