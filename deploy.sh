@@ -8,4 +8,4 @@ echo "--- creating .nojekyll ---"
 touch docs/.nojekyll
 
 echo "--- starting upload ---"
-npx gh-pages --dotfiles -d docs
+npm run upload:docs
