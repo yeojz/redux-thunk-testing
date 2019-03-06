@@ -228,7 +228,7 @@ function action() {
 
 ```
 
-However, in order to do the above, you'll need the following middleware.
+However, in order to do the above, you will need the following middleware.
 
 ```js
 const fsaThunk = () => next => action => {
@@ -253,7 +253,7 @@ const store = createStore(
 
 ## License
 
-`redux-thunk-testing` is [MIT licensed](./LICENSE)
+`redux-thunk-testing` is [MIT licensed](https://github.com/yeojz/redux-thunk-testing/blob/master/LICENSE)
 
 [npm-badge]: https://img.shields.io/npm/v/redux-thunk-testing.svg?style=flat-square
 [npm-link]: https://www.npmjs.com/package/redux-thunk-testing
