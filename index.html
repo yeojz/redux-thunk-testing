@@ -139,19 +139,19 @@
 				of available methods.</p>
 				<h2 id="examples">Examples</h2>
 				<ul>
-					<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple">simple</a><ul>
-							<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple/__snapshots__/actions.test.js.snap">snapshot</a></li>
+					<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/examples/simple">simple</a><ul>
+							<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/examples/simple/__snapshots__/actions.test.js.snap">snapshot</a></li>
 						</ul>
 					</li>
-					<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/redux-thunk-readme-example">redux-thunk-readme-example</a><ul>
-							<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex/__snapshots__/actions.test.js.snap">snapshot</a></li>
+					<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme">redux-thunk-readme-example</a><ul>
+							<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme/__snapshots__/actions.test.js.snap">snapshot</a></li>
 						</ul>
 					</li>
 				</ul>
 				<h3 id="about-the-redux-thunk-readme-example">About the redux-thunk-readme-example</h3>
 				<p>These are sample tests written for the &quot;make a sandwich&quot; code example from
 					<code>redux-thunk</code> <a href="https://github.com/reduxjs/redux-thunk/blob/d5b6921037ea4ac414e8b6ba3398e4cd6287784c/README.md#Composition">README.md</a>. A copy of the example
-				has been copied over. Please see <a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex/action.js">redux-thunk-readme-example/action.js</a>.</p>
+				has been copied over. Please see <a href="https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme/actions.js">examples/redux-thunk-readme/action.js</a>.</p>
 				<p><strong>Small change:</strong></p>
 				<p>Unlike the original example, <code>fetchSecretSauce()</code> is assumed to be injected as an extraArgument
 				to a thunk. <em>This is the only change.</em></p>
@@ -266,7 +266,7 @@ tester.dispatch({
   }
 }
 </code></pre>
-				<p>However, in order to do the above, you&#39;ll need the following middleware.</p>
+				<p>However, in order to do the above, you will need the following middleware.</p>
 				<pre><code class="language-js"><span class="hljs-keyword">const</span> fsaThunk = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> next =&gt; <span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {
   <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> action.payload === <span class="hljs-string">'function'</span>) {
      <span class="hljs-comment">// Convert to a thunk action</span>
@@ -286,7 +286,7 @@ tester.dispatch({
   )
 );</code></pre>
 				<h2 id="license">License</h2>
-				<p><code>redux-thunk-testing</code> is <a href="./LICENSE">MIT licensed</a></p>
+				<p><code>redux-thunk-testing</code> is <a href="https://github.com/yeojz/redux-thunk-testing/blob/master/LICENSE">MIT licensed</a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
