@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./build.sh",
     "build:code": "babel src --out-dir build --extensions '.ts' --ignore '**/*.test.ts'",
-    "build:docs": "typedoc src",
+    "build:docs": "typedoc src/index.ts",
     "build:types": "tsc --emitDeclarationOnly",
     "clean": "rimraf build coverage docs",
     "deploy": "./deploy.sh",
