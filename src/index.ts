@@ -1,4 +1,40 @@
-import { AnyAction } from 'redux';
+/**
+ * Actions must have a `type` field that indicates the type of action being
+ * performed.
+ *
+ * Copy of https://github.com/reduxjs/redux/blob/32ac7e64bf548e0287807fae9e622aa9c55ff065/index.d.ts#L18
+ *
+ * @template T the type of the action's `type` tag.
+ */
+export interface Action<T = any> {
+  type: T;
+}
+
+/**
+ * An Action type which accepts any other properties.
+ *
+ * Copy of https://github.com/reduxjs/redux/blob/32ac7e64bf548e0287807fae9e622aa9c55ff065/index.d.ts#L28
+ */
+export interface AnyAction extends Action {
+  // Allows any extra properties to be defined in an action.
+  [extraProps: string]: any;
+}
+
+/**
+ * An Async Action type which has a Function as payload.
+ * This extends from AnyAction and thus other properties are also accepted.
+ *
+ * However, you can also think of this as a derivation of Flux Standard Action,
+ */
+export interface AsyncAction extends AnyAction {
+  payload: Function;
+}
+
+/**
+ * A Test Action defines actions which conforms to either an
+ * AsyncAction or an AnyAction.
+ */
+export type TestAction = AsyncAction | AnyAction;
 
 /**
  * Action type for those functions that returns a thunk
@@ -6,36 +42,34 @@ import { AnyAction } from 'redux';
 export const THUNK_ACTION = 'THUNK_ACTION';
 
 /**
- * Function tag
- * Used when replacing functions in a snapshot
+ * This is used when trying to serialise functions during the process of
+ * normalizing an action for snapshots as functions cannot be compared for
+ * equivalence easily.
  */
 export const FUNCTION_TAG = '[Function]';
 
+/**
+ * A general definition of an object for use during the snapshot
+ * conversion process.
+ */
 export interface AnyObject {
   [keys: string]: unknown;
   [keys: number]: unknown;
 }
 
 /**
- * An action which has a functional payload (async / non-async)
+ * ThunkArgs refers to the "getState" and "extraArguments" parameters
+ * of a thunk. For reference, a thunk is called with the following
+ * signature (dispatch, getState, extraArguments.)
+ *
+ * In the context of this project, these are used with mocks to guide the
+ * executed thunk to a particular execution flow for testing.
  */
-export interface AsyncAction extends AnyAction {
-  payload: Function;
-}
+export type ThunkArgs = [(Function | null)?, unknown?];
 
 /**
- * Actions which are accepted in this module
- */
-export type TestAction = AsyncAction | AnyAction;
-
-/**
- * Extra arguments passed to a thunk
- * i.e. getState + extraArguments
- */
-export type ThunkArgs = [(Function | null)?, any?];
-
-/**
- * A list of actions that were called
+ * CallList is a lit of TestActions which are executed
+ * during the process of executing a thunk.
  */
 export type CallList = Array<TestAction>;
 
@@ -45,8 +79,8 @@ export type CallList = Array<TestAction>;
 export type JestCallList = Array<CallList>;
 
 /**
- * An action tracer that allows you
- * to step through action one by one.
+ * An action tracer that allows you to step through
+ * the list of dispatched actions one by one.
  */
 export interface IActionTracer {
   current(): TestAction | void;
@@ -58,30 +92,36 @@ export interface IActionTracer {
  * The action runner takes an action and recursively
  * calls any thunks with an action runner.
  *
- * @param action TestAction | Function
- * @returns Promise<unknown>
+ * @param action The action to be dispatched. Can be a thunk.
+ * @returns A promise
  */
 export interface IActionRunner {
-  (action: TestAction | Function): Promise<unknown>
-};
+  (action: TestAction | Function): Promise<unknown>;
+}
 
 /**
- * Store for calls
+ * This is a minimal interface for storing the dispatched
+ * actions and all subsequent actions that were triggered from it
+ * in a call stack.
+ *
+ * Think of it as a mock equivalent.
  */
 export interface IActionStore {
+  /**
+   * Returns the entire call stack.
+   */
   readonly calls: CallList;
 
   /**
-   * Gets the action that was called by index
+   * Gets an action at a particular index of the call stack.
    *
-   * @param index - the position of the action which was called.
-   * @returns TestAction | void
+   * @param index The position of the action which was called.
+   * @returns An action or undefined if not found.
    */
   index(index: number): TestAction | void;
 
   /**
-   * Adds to list of dispatched values
-   * (internal method)
+   * Adds an action to it's own internal call stack.
    *
    * @param action TestAction
    * @returns void
@@ -90,10 +130,10 @@ export interface IActionStore {
 }
 
 /**
- * Converts thunks to actions with thunk payloads
+ * Normalizes actions by converting thunks into an AsyncAction
  *
- * @param action Function
- * @return TestAction
+ * @param action An action or thunk
+ * @returns An action object
  */
 export function actionNormalizer(action: TestAction | Function): TestAction {
   if (typeof action === 'function') {
@@ -112,10 +152,14 @@ export function actionNormalizer(action: TestAction | Function): TestAction {
 export const actionNormaliser = actionNormalizer;
 
 /**
- * Deep converts an object into a snapshot friendly structure
+ * Recursively converts all values of an object into
+ * a snapshot friendly representation of the object.
  *
- * @param value object
- * @returns object
+ * Note: This is subject to call stack size limits
+ * Note: This is for use in [[convertGenericToSnapshot]]
+ *
+ * @param value An object
+ * @returns Object that is snapshot friendly
  */
 export function convertObjectToSnapshot(value: AnyObject): AnyObject {
   return Object.getOwnPropertyNames(value).reduce(
@@ -128,10 +172,13 @@ export function convertObjectToSnapshot(value: AnyObject): AnyObject {
 }
 
 /**
- * Deep converts a generic value into a snapshot friendly structure
+ * Recursively converts a generic value into a snapshot friendly representation
  *
- * @param value any basic types
- * @returns any basic types
+ * Note: This is subject to call stack size limits
+ * Note: This is for use in [[actionSnapshot]]
+ *
+ * @param value Any basic types.
+ * @returns Snapshot friendly basic types.
  */
 export function convertGenericToSnapshot(value: unknown): unknown {
   if (typeof value === 'function') {
@@ -150,10 +197,10 @@ export function convertGenericToSnapshot(value: unknown): unknown {
 }
 
 /**
- * Creates a snapshot object for an action.
+ * Creates a snapshot friendly representation of an action.
  *
- * @param action TestAction | Function
- * @returns TestAction
+ * @param action An action or thunk
+ * @returns A snapshot friendly action representation
  */
 export function actionSnapshot(action: TestAction | Function): TestAction {
   if (typeof action === 'function') {
@@ -167,10 +214,10 @@ export function actionSnapshot(action: TestAction | Function): TestAction {
 }
 
 /**
- * Creates an array of snapshot objects for the list of actions.
+ * Creates a snapshot representation for all values within an array
  *
- * @param actions Array<TestAction>
- * @returns Array<TestAction>
+ * @param actions An array of actions
+ * @returns An array of snapshot friendly representations
  */
 export function actionArraySnapshot(
   actions: Array<TestAction | Function>
@@ -179,21 +226,23 @@ export function actionArraySnapshot(
 }
 
 /**
- * Generates an array of snapshots from an IActionStore compatible tester.
+ * Creates a snapshot representation of entire action call stack of an [[IActionStore]]
  *
- * @param tester IActionStore
- * @returns Array<TestAction>
+ * @param tester An IActionStore compatible instance.
+ * @returns An array of snapshot friendly representations.
  */
 export function actionTesterSnapshot(tester: IActionStore): Array<TestAction> {
   return actionArraySnapshot(tester.calls);
 }
 
 /**
- * Creates an action runner.
+ * An action runner runs an action and recursively executes all
+ * thunks that are found within the executed action as well
+ * and it's subsequent actions.
  *
- * @param tester IActionStore
- * @param thunkArgs getState + extraArguments
- * @returns Function
+ * @param tester An IActionStore compatible instance.
+ * @param thunkArgs getState and extraArguments of a thunk
+ * @returns An action runner.
  */
 export function createActionRunner(
   tester: IActionStore,
@@ -215,11 +264,10 @@ export function createActionRunner(
 }
 
 /**
- * Gets an object with step methods for stepping through
- * the called actions.
+ * Gets a tracer instance for the specified IActionStore
  *
- * @param tester IActionStore
- * @returns IActionTracer
+ * @param tester An IActionStore compatible instance.
+ * @returns An action tracer
  */
 export function actionTracer(tester: IActionStore): IActionTracer {
   let index = -1;
@@ -238,17 +286,18 @@ export function actionTracer(tester: IActionStore): IActionTracer {
 }
 
 /**
- * Gets a list of action.type that were called.
+ * Gets an array of action.types from the call stack of the specified IActionStore
  *
- * @param tester - IActionStore
- * @returns Array<string>
+ * @param tester An IActionStore compaitble instance
+ * @returns An array of action.types
  */
 export function actionTypes(tester: IActionStore): Array<string> {
   return tester.calls.map((action: TestAction) => action.type);
 }
 
 /**
- * A test-framework independent test runner class
+ * A test-framework independent test runner
+ * This encapsulates the singular functions within this library into a class
  */
 export class ActionTester implements IActionStore {
   callList: CallList = [];
@@ -272,16 +321,17 @@ export class ActionTester implements IActionStore {
   /**
    * Sets the remaining 2 arguments of a thunk action.
    *
-   * @param getState - Mock store.getState function
-   * @param extraArgument - Mock values injected via thunk.withExtraArgument
+   * @param getState Mock store.getState function
+   * @param extraArgument Mock values injected via thunk.withExtraArgument
    * @returns void
    */
-  setArgs = (getState: Function | null, extraArgument: any): void => {
+  setArgs = (getState?: Function | null, extraArgument?: unknown): void => {
     this.thunkArgs = [getState, extraArgument];
   };
 
   /**
-   * Dispatches an action and runs through the call tree.
+   * Dispatches an action and recursively executes all thunks of an action
+   * and it's subsequent actions.
    *
    * @param action TestAction | Function
    * @returns Promise<unknown>
@@ -292,24 +342,23 @@ export class ActionTester implements IActionStore {
   };
 
   /**
-   * Gets a list containing only the type of dispatched actions
-   * in the order in which they were called.
+   * Gets an array of action.type of dispatched actions
    *
-   * @returns Array<string>
+   * @returns An array of action.type
    */
   toTypes = (): Array<string> => actionTypes(this);
 
   /**
    * Gets a object containing step functions to step through the calls.
    *
-   * @returns IActionTracer
+   * @returns An action tracer
    */
   toTracer = (): IActionTracer => actionTracer(this);
 
   /**
-   * Generates a snapshot of actions dispatched.
+   * Generates a snapshot of the dispatched actions.
    *
-   * @returns Array<TestAction>
+   * @returns A list of snapshot friendly representation of the actions dispatched
    */
   toSnapshot = (): Array<TestAction> => {
     return actionTesterSnapshot(this);
@@ -317,7 +366,7 @@ export class ActionTester implements IActionStore {
 }
 
 /**
- * A jest compatible test runner class
+ * An ActionTester class which is jest compatible
  */
 export class JestActionTester extends ActionTester {
   jestFn: any;
@@ -332,15 +381,27 @@ export class JestActionTester extends ActionTester {
     this.jestFn = jestFn;
   }
 
+  /**
+   * Re-maps all jest.fn().mock.calls array to the ActionTester
+   * compatible version
+   *
+   * @returns An array of actions
+   */
   get calls(): CallList {
     return this.jestFn.mock.calls.map((c: JestCallList) => c[0]);
   }
 
+  /**
+   * Retrieves the action from the provided jest.fn()
+   */
   index = (index: number): TestAction | void => {
     const called = this.jestFn.mock.calls[index];
     return Array.isArray(called) ? called[0] : void 0;
   };
 
+  /**
+   * Calls the action with the provided jest.fn();
+   */
   add = (action: TestAction): void => {
     this.jestFn(action);
   };
