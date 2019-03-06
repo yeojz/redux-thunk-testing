@@ -1,5 +1,6 @@
 {
+  "exclude": ["examples", "tests", "**/*.test.ts"],
+  "gaID": "UA-91076742-4",
   "mode": "file",
-  "out": "docs",
-  "exclude": ["tests", "**/*.test.ts"]
+  "out": "docs"
 }

@@ -1,6 +1,6 @@
 # redux-thunk-testing
 
-> Test utility for less painful async thunk testing / snapshot testing
+> Test utility and Snapshot testing for complex and nested redux-thunks
 
 [![npm][npm-badge]][npm-link]
 [![Build Status][circle-badge]][circle-link]
@@ -17,7 +17,7 @@
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Examples](#examples)
-  - [About code in tests/complex](#about-code-in-testscomplex)
+  - [About the redux-thunk-readme-example](#about-the-redux-thunk-readme-example)
 - [Notes](#notes)
   - [Thunks are assumed to be async](#thunks-are-assumed-to-be-async)
   - [`THUNK_ACTION`](#thunkaction)
@@ -32,15 +32,14 @@
 and is nearly as ubiquitous as redux itself.
 
 However, as more complex flows and async actions are added, it becomes harder and more unwieldy to test.
-Some projects like [redux-saga][redux-saga-link] were created to help handle such issues.
-
-That aside, there might be situations where using such projects might not be a viable option due
-to constraints and requirements of the project.
+Some projects like [redux-saga][redux-saga-link] were created to help handle such issues, but
+there might be situations where using such projects might not be a viable option due to
+constraints and requirements of the project.
 
 ## About This Package
 
-`redux-thunk-testing` is a small utility/wrapper which aims to help testing complex thunk actions and
-their side effects easily. Conceptually, it runs through the action, executing all the thunks that
+`redux-thunk-testing` is a small utility/wrapper which aims to help in testing complex thunk actions
+and their side effects easily. Conceptually, it runs through the action, executing all the thunks that
 are found, and subsequently provides utilities around the results for testing.
 
 ## Features
@@ -50,9 +49,10 @@ are found, and subsequently provides utilities around the results for testing.
   - Provides `ActionTester` which can be used on it's own.
   - Provides `JestActionTester` for usage with `jest.fn()`
 - Supports `thunk.withExtraArgument`
-  - For more info about extraArguments, check out: [here][redux-thunk-with-extra-arg] and [here][medium-thunk-with-extra-arg]
+  - For more info about extraArguments, check out: [here][article-redux-thunk-readme] and [here][article-medium]
 - Supports `flux standard actions` with a thunk function as payload. [see notes](#flux-standard-action-with-thunk-payload)
 - TypeScript support ([definition file](https://unpkg.com/redux-thunk-testing/index.d.ts))
+- Provides both `functional` and `classes` utilities.
 
 ## Installation
 
@@ -64,33 +64,50 @@ npm install redux-thunk-testing --save-dev
 
 ## Documentation
 
-- [Link to Documentation][project-docs]
+Quick overview of functions / classes
+
+- `class` ActionTester
+- `class` JestActionTester
+- `function` actionArraySnapshot
+- `function` actionSnapshot
+- `function` actionTesterSnapshot
+- `function` actionTracer
+- `function` actionTypes
+- `function` createActionRunner
+
+Please refer to [Project Documentation][project-docs] for the full list
+of available methods.
 
 ## Examples
 
-- [src/index.test.ts][index-test-ts]
-- [tests/simple][example-simple]
-- [tests/complex][example-complex]
+- [simple][example-simple]
+  - [snapshot][example-simple-snapshot]
+- [redux-thunk-readme-example][redux-thunk-readme-example]
+  - [snapshot][redux-thunk-readme-example-snapshot]
 
-### About code in tests/complex
+### About the redux-thunk-readme-example
 
 These are sample tests written for the "make a sandwich" code example from
 `redux-thunk` [README.md][redux-thunk-readme-link]. A copy of the example
-has been copied over.
+has been copied over. Please see [redux-thunk-readme-example/action.js][redux-thunk-readme-example-action-js].
 
-**Small change:** instead of declaring `fetchSecretSauce()`, this is assumed
-to be injected as an extraArgument to a thunk.
+**Small change:**
+
+Unlike the original example, `fetchSecretSauce()` is assumed to be injected as an extraArgument
+to a thunk. _This is the only change._
 
 **Snippet:**
 
 ```js
 test('have enough money to make sandwiches for all', async () => {
   // Setup tester + other thunk paramters
-  // It is highly recommended to use thunk.withExtraArguments to inject
-  // your dependencies. It makes testing much easier.
   const tester = new JestActionTester(jest.fn());
-  // Or const tester = new ActionTester(); if you're not using jest.
+  // OR if you're not using jest.
+  const tester = new ActionTester();
 
+  // Setup other optional thunk parameters if you use them.
+  // It is highly recommended to use thunk.withExtraArguments to inject
+  // your dependencies like apis. It makes testing much easier as shown here.
   const getState = jest.fn();
   const extraArgs = {
     api: {
@@ -163,8 +180,8 @@ still call it with `async` / `Promise.resolve`
 
 ### `THUNK_ACTION`
 
-This `action.type` is logged when the action being dispatched is a function an not
-as a functional payload of a "Flux Standard Action"
+This `action.type` is logged when the action being dispatched is a direct function / thunk and not
+a functional payload of a "Flux Standard Action"
 
 ```js
 // Given
@@ -248,14 +265,18 @@ const store = createStore(
 [type-ts-link]: https://github.com/yeojz/redux-thunk-testing/tree/master/src/index.ts
 [codecov-badge]: https://img.shields.io/codecov/c/github/yeojz/redux-thunk-testing/master.svg?style=flat-square
 [codecov-link]: https://codecov.io/gh/yeojz/redux-thunk-testing
+[project-docs]: https://yeojz.github.io/redux-thunk-testing
+
+[redux-saga-link]: https://www.npmjs.com/package/redux-saga
+
+[example-simple]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple
+[example-simple-snapshot]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple/__snapshots__/actions.test.js.snap
 
 [redux-thunk-link]: https://www.npmjs.com/package/redux-thunk
 [redux-thunk-readme-link]: https://github.com/reduxjs/redux-thunk/blob/d5b6921037ea4ac414e8b6ba3398e4cd6287784c/README.md#Composition
-[redux-sage-link]: https://www.npmjs.com/package/redux-saga
-[example-simple]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple
-[example-complex]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex
-[index-test-ts]: https://github.com/yeojz/redux-thunk-testing/blob/master/src/index.test.ts
+[redux-thunk-readme-example]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/redux-thunk-readme-example
+[redux-thunk-readme-example-action-js]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex/action.js
+[redux-thunk-readme-example-snapshot]: https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex/__snapshots__/actions.test.js.snap
 
-[redux-thunk-with-extra-arg]: https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument
-[medium-thunk-with-extra-arg]: https://medium.com/@yeojz/redux-thunk-skipping-mocks-using-withextraargument-513d38d38554
-[project-docs]: https://yeojz.github.io/redux-thunk-testing
+[article-redux-thunk-readme]: https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument
+[article-medium]: https://medium.com/@yeojz/redux-thunk-skipping-mocks-using-withextraargument-513d38d38554

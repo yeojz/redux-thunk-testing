@@ -4,7 +4,7 @@ import {
   actionAnonymous,
   actionThree,
   actionSix
-} from '../tests/actions';
+} from '../examples/actions';
 import {
   ActionTester,
   JestActionTester,

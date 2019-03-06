@@ -1,7 +1,7 @@
 {
   "name": "redux-thunk-testing",
   "version": "2.1.1",
-  "description": ":nut_and_bolt: Test utility for less painful async thunk testing",
+  "description": "Test utility and Snapshot testing for complex and nested redux-thunks",
   "main": "./index.js",
   "scripts": {
     "build": "./build.sh",
@@ -58,6 +58,7 @@
   },
   "jest": {
     "coveragePathIgnorePatterns": [
+      "./examples",
       "./tests"
     ],
     "moduleDirectories": [
