@@ -275,7 +275,7 @@ const store = createStore(
 [redux-thunk-link]: https://www.npmjs.com/package/redux-thunk
 [redux-thunk-readme-link]: https://github.com/reduxjs/redux-thunk/blob/d5b6921037ea4ac414e8b6ba3398e4cd6287784c/README.md#Composition
 [redux-thunk-readme-example]: https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme
-[redux-thunk-readme-example-action-js]: https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme/action.js
+[redux-thunk-readme-example-action-js]: https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme/actions.js
 [redux-thunk-readme-example-snapshot]: https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme/__snapshots__/actions.test.js.snap
 
 [article-redux-thunk-readme]: https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument
