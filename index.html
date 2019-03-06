@@ -66,7 +66,7 @@
 			<div class="tsd-panel tsd-typography">
 				<h1 id="redux-thunk-testing">redux-thunk-testing</h1>
 				<blockquote>
-					<p>Test utility for less painful async thunk testing / snapshot testing</p>
+					<p>Test utility and Snapshot testing for complex and nested redux-thunks</p>
 				</blockquote>
 				<p><a href="https://www.npmjs.com/package/redux-thunk-testing"><img src="https://img.shields.io/npm/v/redux-thunk-testing.svg?style=flat-square" alt="npm"></a>
 					<a href="https://circleci.com/gh/yeojz/redux-thunk-testing"><img src="https://img.shields.io/circleci/project/github/yeojz/redux-thunk-testing/master.svg?style=flat-square" alt="Build Status"></a>
@@ -81,7 +81,7 @@
 					<li><a href="#installation">Installation</a></li>
 					<li><a href="#documentation">Documentation</a></li>
 					<li><a href="#examples">Examples</a><ul>
-							<li><a href="#about-code-in-testscomplex">About code in tests/complex</a></li>
+							<li><a href="#about-the-redux-thunk-readme-example">About the redux-thunk-readme-example</a></li>
 						</ul>
 					</li>
 					<li><a href="#notes">Notes</a><ul>
@@ -97,12 +97,12 @@
 				<p><a href="https://www.npmjs.com/package/redux-thunk">redux-thunk</a> is a simple middleware for async and side-effects logic,
 				and is nearly as ubiquitous as redux itself.</p>
 				<p>However, as more complex flows and async actions are added, it becomes harder and more unwieldy to test.
-				Some projects like [redux-saga][redux-saga-link] were created to help handle such issues.</p>
-				<p>That aside, there might be situations where using such projects might not be a viable option due
-				to constraints and requirements of the project.</p>
+					Some projects like <a href="https://www.npmjs.com/package/redux-saga">redux-saga</a> were created to help handle such issues, but
+					there might be situations where using such projects might not be a viable option due to
+				constraints and requirements of the project.</p>
 				<h2 id="about-this-package">About This Package</h2>
-				<p><code>redux-thunk-testing</code> is a small utility/wrapper which aims to help testing complex thunk actions and
-					their side effects easily. Conceptually, it runs through the action, executing all the thunks that
+				<p><code>redux-thunk-testing</code> is a small utility/wrapper which aims to help in testing complex thunk actions
+					and their side effects easily. Conceptually, it runs through the action, executing all the thunks that
 				are found, and subsequently provides utilities around the results for testing.</p>
 				<h2 id="features">Features</h2>
 				<ul>
@@ -118,34 +118,53 @@
 					</li>
 					<li>Supports <code>flux standard actions</code> with a thunk function as payload. <a href="#flux-standard-action-with-thunk-payload">see notes</a></li>
 					<li>TypeScript support (<a href="https://unpkg.com/redux-thunk-testing/index.d.ts">definition file</a>)</li>
+					<li>Provides both <code>functional</code> and <code>classes</code> utilities.</li>
 				</ul>
 				<h2 id="installation">Installation</h2>
 				<p>Install the library via:</p>
 				<pre><code class="language-bash">npm install redux-thunk-testing --save-dev</code></pre>
 				<h2 id="documentation">Documentation</h2>
+				<p>Quick overview of functions / classes</p>
 				<ul>
-					<li><a href="https://yeojz.github.io/redux-thunk-testing">Link to Documentation</a></li>
+					<li><code>class</code> ActionTester</li>
+					<li><code>class</code> JestActionTester</li>
+					<li><code>function</code> actionArraySnapshot</li>
+					<li><code>function</code> actionSnapshot</li>
+					<li><code>function</code> actionTesterSnapshot</li>
+					<li><code>function</code> actionTracer</li>
+					<li><code>function</code> actionTypes</li>
+					<li><code>function</code> createActionRunner</li>
 				</ul>
+				<p>Please refer to <a href="https://yeojz.github.io/redux-thunk-testing">Project Documentation</a> for the full list
+				of available methods.</p>
 				<h2 id="examples">Examples</h2>
 				<ul>
-					<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/src/index.test.ts">src/index.test.ts</a></li>
-					<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple">tests/simple</a></li>
-					<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex">tests/complex</a></li>
+					<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple">simple</a><ul>
+							<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/simple/__snapshots__/actions.test.js.snap">snapshot</a></li>
+						</ul>
+					</li>
+					<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/redux-thunk-readme-example">redux-thunk-readme-example</a><ul>
+							<li><a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex/__snapshots__/actions.test.js.snap">snapshot</a></li>
+						</ul>
+					</li>
 				</ul>
-				<h3 id="about-code-in-tests-complex">About code in tests/complex</h3>
+				<h3 id="about-the-redux-thunk-readme-example">About the redux-thunk-readme-example</h3>
 				<p>These are sample tests written for the &quot;make a sandwich&quot; code example from
 					<code>redux-thunk</code> <a href="https://github.com/reduxjs/redux-thunk/blob/d5b6921037ea4ac414e8b6ba3398e4cd6287784c/README.md#Composition">README.md</a>. A copy of the example
-				has been copied over.</p>
-				<p><strong>Small change:</strong> instead of declaring <code>fetchSecretSauce()</code>, this is assumed
-				to be injected as an extraArgument to a thunk.</p>
+				has been copied over. Please see <a href="https://github.com/yeojz/redux-thunk-testing/blob/master/tests/complex/action.js">redux-thunk-readme-example/action.js</a>.</p>
+				<p><strong>Small change:</strong></p>
+				<p>Unlike the original example, <code>fetchSecretSauce()</code> is assumed to be injected as an extraArgument
+				to a thunk. <em>This is the only change.</em></p>
 				<p><strong>Snippet:</strong></p>
 				<pre><code class="language-js">test(<span class="hljs-string">'have enough money to make sandwiches for all'</span>, <span class="hljs-keyword">async</span> () =&gt; {
   <span class="hljs-comment">// Setup tester + other thunk paramters</span>
-  <span class="hljs-comment">// It is highly recommended to use thunk.withExtraArguments to inject</span>
-  <span class="hljs-comment">// your dependencies. It makes testing much easier.</span>
   <span class="hljs-keyword">const</span> tester = <span class="hljs-keyword">new</span> JestActionTester(jest.fn());
-  <span class="hljs-comment">// Or const tester = new ActionTester(); if you're not using jest.</span>
+  <span class="hljs-comment">// OR if you're not using jest.</span>
+  <span class="hljs-keyword">const</span> tester = <span class="hljs-keyword">new</span> ActionTester();
 
+  <span class="hljs-comment">// Setup other optional thunk parameters if you use them.</span>
+  <span class="hljs-comment">// It is highly recommended to use thunk.withExtraArguments to inject</span>
+  <span class="hljs-comment">// your dependencies like apis. It makes testing much easier as shown here.</span>
   <span class="hljs-keyword">const</span> getState = jest.fn();
   <span class="hljs-keyword">const</span> extraArgs = {
     <span class="hljs-attr">api</span>: {
@@ -210,8 +229,8 @@
 				<p>Even if you&#39;re returning a basic type (eg: <code>boolean</code>, <code>string</code>), the parser will
 				still call it with <code>async</code> / <code>Promise.resolve</code></p>
 				<h3 id="thunk_action"><code>THUNK_ACTION</code></h3>
-				<p>This <code>action.type</code> is logged when the action being dispatched is a function an not
-				as a functional payload of a &quot;Flux Standard Action&quot;</p>
+				<p>This <code>action.type</code> is logged when the action being dispatched is a direct function / thunk and not
+				a functional payload of a &quot;Flux Standard Action&quot;</p>
 				<pre><code class="language-js"><span class="hljs-comment">// Given</span>
 <span class="hljs-keyword">const</span> action = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">async</span> (dispatch, getState, extraArgs) =&gt; {
   <span class="hljs-comment">// code ...</span>
@@ -276,13 +295,85 @@ tester.dispatch({
 					<li class="globals  ">
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_index_.html">"index"</a>
-					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-class">
+						<a href="classes/actiontester.html" class="tsd-kind-icon">Action<wbr>Tester</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/jestactiontester.html" class="tsd-kind-icon">Jest<wbr>Action<wbr>Tester</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/action.html" class="tsd-kind-icon">Action</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/anyaction.html" class="tsd-kind-icon">Any<wbr>Action</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/anyobject.html" class="tsd-kind-icon">Any<wbr>Object</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/asyncaction.html" class="tsd-kind-icon">Async<wbr>Action</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iactionrunner.html" class="tsd-kind-icon">IAction<wbr>Runner</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iactionstore.html" class="tsd-kind-icon">IAction<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iactiontracer.html" class="tsd-kind-icon">IAction<wbr>Tracer</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#calllist" class="tsd-kind-icon">Call<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#jestcalllist" class="tsd-kind-icon">Jest<wbr>Call<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#testaction" class="tsd-kind-icon">Test<wbr>Action</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#thunkargs" class="tsd-kind-icon">Thunk<wbr>Args</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#function_tag" class="tsd-kind-icon">FUNCTION_<wbr>TAG</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#thunk_action" class="tsd-kind-icon">THUNK_<wbr>ACTION</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#actionnormaliser" class="tsd-kind-icon">action<wbr>Normaliser</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#actionarraysnapshot" class="tsd-kind-icon">action<wbr>Array<wbr>Snapshot</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#actionnormalizer" class="tsd-kind-icon">action<wbr>Normalizer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#actionsnapshot" class="tsd-kind-icon">action<wbr>Snapshot</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#actiontestersnapshot" class="tsd-kind-icon">action<wbr>Tester<wbr>Snapshot</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#actiontracer" class="tsd-kind-icon">action<wbr>Tracer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#actiontypes" class="tsd-kind-icon">action<wbr>Types</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#convertgenerictosnapshot" class="tsd-kind-icon">convert<wbr>Generic<wbr>ToSnapshot</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#convertobjecttosnapshot" class="tsd-kind-icon">convert<wbr>Object<wbr>ToSnapshot</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createactionrunner" class="tsd-kind-icon">create<wbr>Action<wbr>Runner</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -353,5 +444,14 @@ tester.dispatch({
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>
 <script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+<script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-91076742-4', '');
+        ga('send', 'pageview');
+    </script>
 </body>
 </html>

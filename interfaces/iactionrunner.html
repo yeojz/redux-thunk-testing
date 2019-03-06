@@ -56,10 +56,7 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_index_.html">&quot;index&quot;</a>
-				</li>
-				<li>
-					<a href="_index_.iactionrunner.html">IActionRunner</a>
+					<a href="iactionrunner.html">IActionRunner</a>
 				</li>
 			</ul>
 			<h1>Interface IActionRunner</h1>
@@ -87,14 +84,14 @@
 			</section>
 			<section class="tsd-panel">
 				<h3 class="tsd-before-signature">Callable</h3>
-				<ul class="tsd-signatures tsd-kind-interface tsd-parent-kind-external-module">
-					<li class="tsd-signature tsd-kind-icon">__call<span class="tsd-signature-symbol">(</span>action<span class="tsd-signature-symbol">: </span><a href="../modules/_index_.html#testaction" class="tsd-signature-type">TestAction</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
+				<ul class="tsd-signatures tsd-kind-interface">
+					<li class="tsd-signature tsd-kind-icon">__call<span class="tsd-signature-symbol">(</span>action<span class="tsd-signature-symbol">: </span><a href="../globals.html#testaction" class="tsd-signature-type">TestAction</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/yeojz/redux-thunk-testing/blob/3d1bc47/src/index.ts#L64">index.ts:64</a></li>
+								<li>Defined in <a href="https://github.com/yeojz/redux-thunk-testing/blob/12beb72/src/index.ts#L98">index.ts:98</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -106,16 +103,16 @@
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5>action: <a href="../modules/_index_.html#testaction" class="tsd-signature-type">TestAction</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Function</span></h5>
+								<h5>action: <a href="../globals.html#testaction" class="tsd-signature-type">TestAction</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Function</span></h5>
 								<div class="tsd-comment tsd-typography">
 									<div class="lead">
-										<p>TestAction | Function</p>
+										<p>The action to be dispatched. Can be a thunk.</p>
 									</div>
 								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						<p>Promise<unknown></p>
+						<p>A promise</p>
 					</li>
 				</ul>
 			</section>
@@ -126,85 +123,88 @@
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
-					<li class="current tsd-kind-external-module">
-						<a href="../modules/_index_.html">"index"</a>
-					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_index_.actiontester.html" class="tsd-kind-icon">Action<wbr>Tester</a>
+					<li class=" tsd-kind-class">
+						<a href="../classes/actiontester.html" class="tsd-kind-icon">Action<wbr>Tester</a>
 					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_index_.jestactiontester.html" class="tsd-kind-icon">Jest<wbr>Action<wbr>Tester</a>
+					<li class=" tsd-kind-class">
+						<a href="../classes/jestactiontester.html" class="tsd-kind-icon">Jest<wbr>Action<wbr>Tester</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_index_.anyobject.html" class="tsd-kind-icon">Any<wbr>Object</a>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="action.html" class="tsd-kind-icon">Action</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-has-type-parameter">
-						<a href="_index_.asyncaction.html" class="tsd-kind-icon">Async<wbr>Action</a>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="anyaction.html" class="tsd-kind-icon">Any<wbr>Action</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="anyobject.html" class="tsd-kind-icon">Any<wbr>Object</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="asyncaction.html" class="tsd-kind-icon">Async<wbr>Action</a>
 					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_index_.iactionrunner.html" class="tsd-kind-icon">IAction<wbr>Runner</a>
+					<li class="current tsd-kind-interface">
+						<a href="iactionrunner.html" class="tsd-kind-icon">IAction<wbr>Runner</a>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_index_.iactionstore.html" class="tsd-kind-icon">IAction<wbr>Store</a>
+					<li class=" tsd-kind-interface">
+						<a href="iactionstore.html" class="tsd-kind-icon">IAction<wbr>Store</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_index_.iactiontracer.html" class="tsd-kind-icon">IAction<wbr>Tracer</a>
+					<li class=" tsd-kind-interface">
+						<a href="iactiontracer.html" class="tsd-kind-icon">IAction<wbr>Tracer</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#calllist" class="tsd-kind-icon">Call<wbr>List</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#calllist" class="tsd-kind-icon">Call<wbr>List</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#jestcalllist" class="tsd-kind-icon">Jest<wbr>Call<wbr>List</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#jestcalllist" class="tsd-kind-icon">Jest<wbr>Call<wbr>List</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#testaction" class="tsd-kind-icon">Test<wbr>Action</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#testaction" class="tsd-kind-icon">Test<wbr>Action</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#thunkargs" class="tsd-kind-icon">Thunk<wbr>Args</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#thunkargs" class="tsd-kind-icon">Thunk<wbr>Args</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#function_tag" class="tsd-kind-icon">FUNCTION_<wbr>TAG</a>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#function_tag" class="tsd-kind-icon">FUNCTION_<wbr>TAG</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#thunk_action" class="tsd-kind-icon">THUNK_<wbr>ACTION</a>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#thunk_action" class="tsd-kind-icon">THUNK_<wbr>ACTION</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#actionnormaliser" class="tsd-kind-icon">action<wbr>Normaliser</a>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#actionnormaliser" class="tsd-kind-icon">action<wbr>Normaliser</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#actionarraysnapshot" class="tsd-kind-icon">action<wbr>Array<wbr>Snapshot</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#actionarraysnapshot" class="tsd-kind-icon">action<wbr>Array<wbr>Snapshot</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#actionnormalizer" class="tsd-kind-icon">action<wbr>Normalizer</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#actionnormalizer" class="tsd-kind-icon">action<wbr>Normalizer</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#actionsnapshot" class="tsd-kind-icon">action<wbr>Snapshot</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#actionsnapshot" class="tsd-kind-icon">action<wbr>Snapshot</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#actiontestersnapshot" class="tsd-kind-icon">action<wbr>Tester<wbr>Snapshot</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#actiontestersnapshot" class="tsd-kind-icon">action<wbr>Tester<wbr>Snapshot</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#actiontracer" class="tsd-kind-icon">action<wbr>Tracer</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#actiontracer" class="tsd-kind-icon">action<wbr>Tracer</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#actiontypes" class="tsd-kind-icon">action<wbr>Types</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#actiontypes" class="tsd-kind-icon">action<wbr>Types</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#convertgenerictosnapshot" class="tsd-kind-icon">convert<wbr>Generic<wbr>ToSnapshot</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#convertgenerictosnapshot" class="tsd-kind-icon">convert<wbr>Generic<wbr>ToSnapshot</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#convertobjecttosnapshot" class="tsd-kind-icon">convert<wbr>Object<wbr>ToSnapshot</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#convertobjecttosnapshot" class="tsd-kind-icon">convert<wbr>Object<wbr>ToSnapshot</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="../modules/_index_.html#createactionrunner" class="tsd-kind-icon">create<wbr>Action<wbr>Runner</a>
+					<li class=" tsd-kind-function">
+						<a href="../globals.html#createactionrunner" class="tsd-kind-icon">create<wbr>Action<wbr>Runner</a>
 					</li>
 				</ul>
 			</nav>
@@ -276,5 +276,14 @@
 <div class="overlay"></div>
 <script src="../assets/js/main.js"></script>
 <script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+<script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-91076742-4', '');
+        ga('send', 'pageview');
+    </script>
 </body>
 </html>
