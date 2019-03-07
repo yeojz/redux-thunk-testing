@@ -11,7 +11,7 @@ export function apologize(fromPerson, toPerson, error) {
     type: 'APOLOGIZE',
     fromPerson,
     toPerson,
-    error: error ? error.message : error
+    error
   };
 }
 

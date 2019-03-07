@@ -73,7 +73,7 @@ Array [
     "type": "THUNK_ACTION",
   },
   Object {
-    "error": "oops",
+    "error": [Error: oops],
     "fromPerson": "The Sandwich Shop",
     "toPerson": "Me",
     "type": "APOLOGIZE",
