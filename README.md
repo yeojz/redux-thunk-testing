@@ -129,9 +129,8 @@ test('have enough money to make sandwiches for all', async () => {
   await tester.dispatch(makeSandwichesForEverybody());
 
   // Using Jest Snapshot
-  expect(tester.toSnapshot()).toMatchSnapshot();
+  expect(tester.calls).toMatchSnapshot();
 
-  // Snapshot Testing
   // Generating our own inline snapshot with
   // expected function calls
   const expected = actionArraySnapshot([
@@ -147,6 +146,7 @@ test('have enough money to make sandwiches for all', async () => {
     withdrawMoney(42)
   ]);
 
+  // Snapshot Testing (without depending on Jest)
   expect(tester.toSnapshot()).toEqual(expected);
 
   // Alternatively, just check the types

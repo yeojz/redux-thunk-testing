@@ -3,7 +3,7 @@
 exports[`simple using snapshot 1`] = `
 Array [
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {

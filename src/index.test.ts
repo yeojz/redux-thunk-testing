@@ -10,7 +10,7 @@ import {
   JestActionTester,
   THUNK_ACTION,
   actionArraySnapshot,
-  convertGenericToSnapshot
+  actionSnapshot
 } from './index';
 
 function runTestSuite(getTester: () => ActionTester) {
@@ -147,25 +147,10 @@ describe('index', () => {
     runTestSuite(() => new JestActionTester(jest.fn()));
   });
 
-  describe('convertGenericToSnapshot', () => {
-    const action = [
-      {
-        type: 'A1',
-        payload: () => null
-      },
-      {
-        type: 'B1',
-        payload: {
-          b2: [1, true, 'something', () => null],
-          b3: {
-            1: 'val1',
-            '2': 'val2',
-            '3': 3
-          }
-        }
-      }
-    ];
-
-    expect(convertGenericToSnapshot(action)).toMatchSnapshot();
+  describe('actionSnapshot', () => {
+    test('should return expected value', () => {
+      const current = actionSnapshot({ type: 'TEST' });
+      expect(current).toEqual(`Object {\n  "type": "TEST",\n}`);
+    });
   });
 });

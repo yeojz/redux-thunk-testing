@@ -1,3 +1,5 @@
+import prettyFormat from 'pretty-format';
+
 /**
  * Actions must have a `type` field that indicates the type of action being
  * performed.
@@ -40,22 +42,6 @@ export type TestAction = AsyncAction | AnyAction;
  * Action type for those functions that returns a thunk
  */
 export const THUNK_ACTION = 'THUNK_ACTION';
-
-/**
- * This is used when trying to serialise functions during the process of
- * normalizing an action for snapshots as functions cannot be compared for
- * equivalence easily.
- */
-export const FUNCTION_TAG = '[Function]';
-
-/**
- * A general definition of an object for use during the snapshot
- * conversion process.
- */
-export interface AnyObject {
-  [keys: string]: unknown;
-  [keys: number]: unknown;
-}
 
 /**
  * ThunkArgs refers to the "getState" and "extraArguments" parameters
@@ -152,86 +138,46 @@ export function actionNormalizer(action: TestAction | Function): TestAction {
 export const actionNormaliser = actionNormalizer;
 
 /**
- * Recursively converts all values of an object into
- * a snapshot friendly representation of the object.
+ * Normalizes and stringifies the values using pretty-format
  *
- * Note: This is subject to call stack size limits
- * Note: This is for use in [[convertGenericToSnapshot]]
- *
- * @param value An object
- * @returns Object that is snapshot friendly
+ * @param value Any value
+ * @returns A pretty-formatted stringified value.
  */
-export function convertObjectToSnapshot(value: AnyObject): AnyObject {
-  return Object.getOwnPropertyNames(value).reduce(
-    (collect: AnyObject, key: keyof AnyObject): AnyObject => ({
-      ...collect,
-      [key]: convertGenericToSnapshot(value[key])
-    }),
-    <AnyObject>{}
-  );
-}
-
-/**
- * Recursively converts a generic value into a snapshot friendly representation
- *
- * Note: This is subject to call stack size limits
- * Note: This is for use in [[actionSnapshot]]
- *
- * @param value Any basic types.
- * @returns Snapshot friendly basic types.
- */
-export function convertGenericToSnapshot(value: unknown): unknown {
-  if (typeof value === 'function') {
-    return FUNCTION_TAG;
-  }
-
-  if (Array.isArray(value)) {
-    return value.map(convertGenericToSnapshot);
-  }
-
-  if (typeof value === 'object' && value != null) {
-    return convertObjectToSnapshot(<AnyObject>value);
-  }
-
-  return value;
+export function createSnapshotString(value: any): string {
+  return prettyFormat(value, { printFunctionName: false });
 }
 
 /**
  * Creates a snapshot friendly representation of an action.
  *
- * @param action An action or thunk
- * @returns A snapshot friendly action representation
+ * @param action An action or thunk.
+ * @returns A pretty-formatted stringified action or thunk.
  */
-export function actionSnapshot(action: TestAction | Function): TestAction {
-  if (typeof action === 'function') {
-    return {
-      type: THUNK_ACTION,
-      payload: FUNCTION_TAG
-    };
-  }
-
-  return <TestAction>convertGenericToSnapshot(action);
+export function actionSnapshot(action: TestAction | Function): string {
+  const normalized = actionNormalizer(action);
+  return createSnapshotString(normalized);
 }
 
 /**
  * Creates a snapshot representation for all values within an array
  *
- * @param actions An array of actions
- * @returns An array of snapshot friendly representations
+ * @param actions An array of actions.
+ * @returns A pretty-formatted stringified list of actions.
  */
 export function actionArraySnapshot(
   actions: Array<TestAction | Function>
-): Array<TestAction> {
-  return actions.map(c => actionSnapshot(c));
+): string {
+  const normalized = actions.map(actionNormalizer);
+  return createSnapshotString(normalized);
 }
 
 /**
  * Creates a snapshot representation of entire action call stack of an [[IActionStore]]
  *
  * @param tester An IActionStore compatible instance.
- * @returns An array of snapshot friendly representations.
+ * @returns A pretty-formatted stringified list of actions.
  */
-export function actionTesterSnapshot(tester: IActionStore): Array<TestAction> {
+export function actionTesterSnapshot(tester: IActionStore): string {
   return actionArraySnapshot(tester.calls);
 }
 
@@ -358,9 +304,9 @@ export class ActionTester implements IActionStore {
   /**
    * Generates a snapshot of the dispatched actions.
    *
-   * @returns A list of snapshot friendly representation of the actions dispatched
+   * @returns  A pretty-formatted stringified value.
    */
-  toSnapshot = (): Array<TestAction> => {
+  toSnapshot = (): string => {
     return actionTesterSnapshot(this);
   };
 }

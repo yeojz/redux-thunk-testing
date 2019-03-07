@@ -196,4 +196,3 @@ workflows:
           requires:
             - hold
           filters: *filter_tag_stable
-
