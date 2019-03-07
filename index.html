@@ -107,24 +107,24 @@
 				<h2 id="features">Features</h2>
 				<ul>
 					<li>Supports <strong>Snapshot Testing</strong></li>
-					<li>Test framework agnostic.<ul>
-							<li>Provides <code>ActionTester</code> which can be used on it&#39;s own.</li>
-							<li>Provides <code>JestActionTester</code> for usage with <code>jest.fn()</code></li>
+					<li>Test / Assertion framework agnostic.<ul>
+							<li><code>ActionTester</code> - for usage with <code>any assertion library</code>. (eg: Chai.js)</li>
+							<li><code>JestActionTester</code> - for usage with <code>jest.fn()</code>.</li>
 						</ul>
 					</li>
 					<li>Supports <code>thunk.withExtraArgument</code><ul>
 							<li>For more info about extraArguments, check out: <a href="https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument">here</a> and <a href="https://medium.com/@yeojz/redux-thunk-skipping-mocks-using-withextraargument-513d38d38554">here</a></li>
 						</ul>
 					</li>
-					<li>Supports <code>flux standard actions</code> with a thunk function as payload. <a href="#flux-standard-action-with-thunk-payload">see notes</a></li>
+					<li>Supports actions that return <code>thunks</code>.</li>
+					<li>Supports <code>flux standard actions</code> with a thunk as the payload. <a href="#flux-standard-action-with-thunk-payload">see notes</a></li>
 					<li>TypeScript support (<a href="https://unpkg.com/redux-thunk-testing/index.d.ts">definition file</a>)</li>
-					<li>Provides both <code>functional</code> and <code>classes</code> utilities.</li>
 				</ul>
 				<h2 id="installation">Installation</h2>
 				<p>Install the library via:</p>
 				<pre><code class="language-bash">npm install redux-thunk-testing --save-dev</code></pre>
 				<h2 id="documentation">Documentation</h2>
-				<p>Quick overview of functions / classes</p>
+				<p>Quick overview of functions / classes:</p>
 				<ul>
 					<li><code>class</code> ActionTester</li>
 					<li><code>class</code> JestActionTester</li>
@@ -135,6 +135,7 @@
 					<li><code>function</code> actionTypes</li>
 					<li><code>function</code> createActionRunner</li>
 				</ul>
+				<p>The classes encapsulates the functions within this library.</p>
 				<p>Please refer to <a href="https://yeojz.github.io/redux-thunk-testing">Project Documentation</a> for the full list
 				of available methods.</p>
 				<h2 id="examples">Examples</h2>
@@ -186,9 +187,8 @@
   <span class="hljs-keyword">await</span> tester.dispatch(makeSandwichesForEverybody());
 
   <span class="hljs-comment">// Using Jest Snapshot</span>
-  expect(tester.toSnapshot()).toMatchSnapshot();
+  expect(tester.calls).toMatchSnapshot();
 
-  <span class="hljs-comment">// Snapshot Testing</span>
   <span class="hljs-comment">// Generating our own inline snapshot with</span>
   <span class="hljs-comment">// expected function calls</span>
   <span class="hljs-keyword">const</span> expected = actionArraySnapshot([
@@ -204,6 +204,7 @@
     withdrawMoney(<span class="hljs-number">42</span>)
   ]);
 
+  <span class="hljs-comment">// Snapshot Testing (without depending on Jest)</span>
   expect(tester.toSnapshot()).toEqual(expected);
 
   <span class="hljs-comment">// Alternatively, just check the types</span>
@@ -311,9 +312,6 @@ tester.dispatch({
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/anyaction.html" class="tsd-kind-icon">Any<wbr>Action</a>
 					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/anyobject.html" class="tsd-kind-icon">Any<wbr>Object</a>
-					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/asyncaction.html" class="tsd-kind-icon">Async<wbr>Action</a>
 					</li>
@@ -337,9 +335,6 @@ tester.dispatch({
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#thunkargs" class="tsd-kind-icon">Thunk<wbr>Args</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="globals.html#function_tag" class="tsd-kind-icon">FUNCTION_<wbr>TAG</a>
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="globals.html#thunk_action" class="tsd-kind-icon">THUNK_<wbr>ACTION</a>
@@ -366,13 +361,10 @@ tester.dispatch({
 						<a href="globals.html#actiontypes" class="tsd-kind-icon">action<wbr>Types</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#convertgenerictosnapshot" class="tsd-kind-icon">convert<wbr>Generic<wbr>ToSnapshot</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="globals.html#convertobjecttosnapshot" class="tsd-kind-icon">convert<wbr>Object<wbr>ToSnapshot</a>
-					</li>
-					<li class=" tsd-kind-function">
 						<a href="globals.html#createactionrunner" class="tsd-kind-icon">create<wbr>Action<wbr>Runner</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createsnapshotstring" class="tsd-kind-icon">create<wbr>Snapshot<wbr>String</a>
 					</li>
 				</ul>
 			</nav>
