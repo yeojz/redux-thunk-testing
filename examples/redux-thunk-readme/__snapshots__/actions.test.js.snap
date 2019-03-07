@@ -3,11 +3,11 @@
 exports[`complex makeSandwichesForEverybody have enough money to make sandwiches for all 1`] = `
 Array [
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {
@@ -16,11 +16,11 @@ Array [
     "type": "MAKE_SANDWICH",
   },
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {
@@ -34,7 +34,7 @@ Array [
     "type": "MAKE_SANDWICH",
   },
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {
@@ -52,11 +52,11 @@ Array [
 exports[`complex makeSandwichesForEverybody not enough money to make sandwiches for all + no sauce for me 1`] = `
 Array [
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {
@@ -65,11 +65,11 @@ Array [
     "type": "MAKE_SANDWICH",
   },
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {
@@ -84,7 +84,7 @@ Array [
     "type": "MAKE_SANDWICH",
   },
   Object {
-    "payload": "[Function]",
+    "payload": [Function],
     "type": "THUNK_ACTION",
   },
   Object {

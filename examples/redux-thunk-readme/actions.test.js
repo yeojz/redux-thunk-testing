@@ -79,7 +79,7 @@ describe('complex', () => {
       await tester.dispatch(makeSandwichesForEverybody());
 
       // Using Jest snapshot
-      expect(tester.toSnapshot()).toMatchSnapshot();
+      expect(tester.calls).toMatchSnapshot();
 
       // Generating our own inline snapshot with
       // expected function calls
@@ -96,7 +96,7 @@ describe('complex', () => {
         withdrawMoney(42)
       ]);
 
-      // Snapshot Testing
+      // Snapshot Testing (without depending on Jest)
       expect(tester.toSnapshot()).toEqual(expected);
 
       // Alternatively, just check the types
@@ -143,12 +143,11 @@ describe('complex', () => {
       await tester.dispatch(makeSandwichesForEverybody());
 
       // Using Jest Snapshot
-      expect(tester.toSnapshot()).toMatchSnapshot();
+      expect(tester.calls).toMatchSnapshot();
 
-      // Snapshot Testing
       // Generating our own inline snapshot with
       // expected function calls
-      setup();
+      setup(); // running setup again to reset the mocks
       const expected = actionArraySnapshot([
         makeSandwichesForEverybody(),
         makeASandwichWithSecretSauce('My Grandma'),
@@ -162,6 +161,7 @@ describe('complex', () => {
         apologize('Me', 'The Sandwich Shop')
       ]);
 
+      // Snapshot Testing (without depending on Jest)
       expect(tester.toSnapshot()).toEqual(expected);
 
       // Alternatively, just check the types

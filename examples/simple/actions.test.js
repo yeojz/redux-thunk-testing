@@ -28,13 +28,13 @@ describe('simple', () => {
     const tester = await getTester();
 
     // Using Jest Snapshot
-    expect(tester.toSnapshot()).toMatchSnapshot();
+    expect(tester.calls).toMatchSnapshot();
 
-    // Snapshot Testing
     // Generating our own inline snapshot with
     // expected function calls
     const expected = actionArraySnapshot([action(), action1(), action2()]);
 
+    // Snapshot Testing (without depending on Jest)
     expect(tester.toSnapshot()).toEqual(expected);
   });
 });
