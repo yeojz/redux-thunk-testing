@@ -45,14 +45,14 @@ are found, and subsequently provides utilities around the results for testing.
 ## Features
 
 - Supports **Snapshot Testing**
-- Test framework agnostic.
-  - Provides `ActionTester` which can be used on it's own.
-  - Provides `JestActionTester` for usage with `jest.fn()`
+- Test / Assertion framework agnostic.
+  - `ActionTester` - for usage with `any assertion library`. (eg: Chai.js)
+  - `JestActionTester` - for usage with `jest.fn()`.
 - Supports `thunk.withExtraArgument`
   - For more info about extraArguments, check out: [here][article-redux-thunk-readme] and [here][article-medium]
-- Supports `flux standard actions` with a thunk function as payload. [see notes](#flux-standard-action-with-thunk-payload)
+- Supports actions that return `thunks`.
+- Supports `flux standard actions` with a thunk as the payload. [see notes](#flux-standard-action-with-thunk-payload)
 - TypeScript support ([definition file](https://unpkg.com/redux-thunk-testing/index.d.ts))
-- Provides both `functional` and `classes` utilities.
 
 ## Installation
 
@@ -64,7 +64,7 @@ npm install redux-thunk-testing --save-dev
 
 ## Documentation
 
-Quick overview of functions / classes
+Quick overview of functions / classes:
 
 - `class` ActionTester
 - `class` JestActionTester
@@ -74,6 +74,8 @@ Quick overview of functions / classes
 - `function` actionTracer
 - `function` actionTypes
 - `function` createActionRunner
+
+The classes encapsulates the functions within this library.
 
 Please refer to [Project Documentation][project-docs] for the full list
 of available methods.
