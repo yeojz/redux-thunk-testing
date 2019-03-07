@@ -89,6 +89,13 @@ aliases:
             if [ -z "$CIRCLE_PULL_REQUEST" ]; then
               echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
               npm publish --tag $RUNTIME_NPM_TAG
+
+              {
+                npm run update:release-notes
+              } || {
+                echo "unable to update release notes."
+              }
+
             else
               echo "skipping publication."
             fi
@@ -114,7 +121,11 @@ jobs:
           name: send coverage report
           command: |
             if [[ $CIRCLE_PROJECT_USERNAME == $PROJECT_OWNER_NAME ]]; then
-              npm run upload:coverage
+              {
+                npm run upload:coverage
+              } || {
+                echo "unable to update coverage."
+              }
             else
               echo "skipping coverage uploading."
             fi
@@ -142,7 +153,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "00:d3:8e:35:12:f0:0e:21:f6:9a:08:a5:b7:22:d3:13"
+            - '00:d3:8e:35:12:f0:0e:21:f6:9a:08:a5:b7:22:d3:13'
       - checkout
       - restore-cache: *restore_release_cache
       - run: *install_npm
