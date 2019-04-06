@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import {
   actionZero,
   actionTypes,
@@ -14,7 +15,7 @@ import {
 } from './index';
 
 function runTestSuite(getTester: () => ActionTester) {
-  async function runCheck(extraArgs: any, expectedResult: Array<string>) {
+  async function runCheck(extraArgs: unknown, expectedResult: string[]) {
     const tester = getTester();
 
     tester.setArgs(null, extraArgs);
