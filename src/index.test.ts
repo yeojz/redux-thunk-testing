@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
+// /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import {
   actionZero,
   actionTypes,
@@ -14,8 +14,13 @@ import {
   actionSnapshot
 } from './index';
 
-function runTestSuite(name: string, getTester: () => ActionTester) {
-  async function runCheck(extraArgs: unknown, expectedResult: string[]) {
+type AsyncTest = Promise<void>;
+
+function runTestSuite(name: string, getTester: () => ActionTester): void {
+  async function runCheck(
+    extraArgs: unknown,
+    expectedResult: string[]
+  ): AsyncTest {
     const tester = getTester();
 
     tester.setArgs(null, extraArgs);
@@ -24,7 +29,7 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
     expect(tester.toTypes()).toEqual(expectedResult);
   }
 
-  test(`[${name}] path: 0 -> 3 -> 6`, async () => {
+  test(`[${name}] path: 0 -> 3 -> 6`, async (): AsyncTest => {
     await runCheck({}, [
       actionTypes.ACTION_0,
       actionTypes.ACTION_3,
@@ -32,7 +37,7 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
     ]);
   });
 
-  test(`[${name}] path: 0 -> 1 -> 4 -> thunk -> 6`, async () => {
+  test(`[${name}] path: 0 -> 1 -> 4 -> thunk -> 6`, async (): AsyncTest => {
     await runCheck(
       {
         one: true
@@ -41,7 +46,7 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
     );
   });
 
-  test(`[${name}] path: 0 -> 1 -> 2 -> 4`, async () => {
+  test(`[${name}] path: 0 -> 1 -> 2 -> 4`, async (): AsyncTest => {
     await runCheck(
       {
         one: true,
@@ -57,7 +62,7 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
     );
   });
 
-  test(`[${name}] path: 0 -> 1 -> 2 -> 5 -> thunk -> 6`, async () => {
+  test(`[${name}] path: 0 -> 1 -> 2 -> 5 -> thunk -> 6`, async (): AsyncTest => {
     await runCheck(
       {
         one: true,
@@ -74,7 +79,7 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
     );
   });
 
-  test(`[${name}] path: thunk -> 6`, async () => {
+  test(`[${name}] path: thunk -> 6`, async (): AsyncTest => {
     const tester = getTester();
     tester.setArgs(null, {});
     await tester.dispatch(actionAnonymous());
@@ -82,7 +87,7 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
     expect(tester.toTypes()).toEqual([THUNK_ACTION, actionTypes.ACTION_6]);
   });
 
-  test(`[${name}] path: thunk -> 6 (use index())`, async () => {
+  test(`[${name}] path: thunk -> 6 (use index())`, async (): AsyncTest => {
     const tester = getTester();
     tester.setArgs(null, {});
     await tester.dispatch(actionAnonymous());
@@ -92,7 +97,7 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
     expect(tester.index(1)).toHaveProperty('type', actionTypes.ACTION_6);
   });
 
-  test(`[${name}] step: 0 -> 3 -> 6`, async () => {
+  test(`[${name}] step: 0 -> 3 -> 6`, async (): AsyncTest => {
     const tester = getTester();
     tester.setArgs(null, {});
     await tester.dispatch(actionZero());
@@ -110,7 +115,7 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
     expect(steps.next()).toBeUndefined();
   });
 
-  test(`[${name}] snapshot: 0 -> 3 -> 6`, async () => {
+  test(`[${name}] snapshot: 0 -> 3 -> 6`, async (): AsyncTest => {
     const tester = getTester();
 
     tester.setArgs(null, {});
@@ -125,7 +130,7 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
     expect(tester.toSnapshot()).toEqual(expectedResult);
   });
 
-  test(`[${name}] snapshot: thunk -> 6`, async () => {
+  test(`[${name}] snapshot: thunk -> 6`, async (): AsyncTest => {
     const tester = getTester();
     tester.setArgs(null, {});
     await tester.dispatch(actionAnonymous());
@@ -137,13 +142,34 @@ function runTestSuite(name: string, getTester: () => ActionTester) {
 
     expect(tester.toSnapshot()).toEqual(expectedResult);
   });
+
+  test(`[${name}] allow for callback style without async`, (done): void => {
+    const tester = getTester();
+
+    tester.setArgs(null, {});
+    tester.dispatch(
+      actionZero(),
+      (): void => {
+        expect(tester.toTypes()).toEqual([
+          actionTypes.ACTION_0,
+          actionTypes.ACTION_3,
+          actionTypes.ACTION_6
+        ]);
+
+        done();
+      }
+    );
+  });
 }
 
-runTestSuite('ActionTester', () => new ActionTester());
+runTestSuite('ActionTester', (): ActionTester => new ActionTester());
 
-runTestSuite('JestActionTester', () => new JestActionTester(jest.fn()));
+runTestSuite(
+  'JestActionTester',
+  (): JestActionTester => new JestActionTester(jest.fn())
+);
 
-test('[actionSnapshot] should return expected value', () => {
+test('[actionSnapshot] should return expected value', (): void => {
   const current = actionSnapshot({ type: 'TEST' });
   expect(current).toEqual(`Object {\n  "type": "TEST",\n}`);
 });

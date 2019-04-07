@@ -19,8 +19,8 @@
 - [Examples](#examples)
   - [About the redux-thunk-readme-example](#about-the-redux-thunk-readme-example)
 - [Notes](#notes)
-  - [Thunks are assumed to be async](#thunks-are-assumed-to-be-async)
-  - [`THUNK_ACTION`](#thunkaction)
+  - [Tests are async](#tests-are-async)
+  - [`THUNK_ACTION` type](#thunkaction-type)
   - [Flux Standard Action with Thunk payload](#flux-standard-action-with-thunk-payload)
 - [License](#license)
 
@@ -145,7 +145,6 @@ test('have enough money to make sandwiches for all', async () => {
 
   await tester.dispatch(makeSandwichesForEverybody());
 
-
   // Expectations
   // -------------------------------
 
@@ -188,25 +187,43 @@ test('have enough money to make sandwiches for all', async () => {
 
 ## Notes
 
-### Thunks are assumed to be async
+### Tests are async
 
-All thunks are treated as `async` methods / returning `promises`.
-As such, you should always call `await` or `Promise.resolve` when
-dispatching the action with ActionTester.
+The runner treats all thunks as `async` methods / returning `promises`, even if you are
+returning a basic type (eg: `boolean`, `string`).
 
-i.e. `await tester.dispatch(action())` or `Promise.resolve(tester.dispatch(action()))`
+As such, when using the tester, you should always use `await` or provide a `done` callback.
 
-Even if you're returning a basic type (eg: `boolean`, `string`), the parser will
-still call it with `async` / `Promise.resolve`
+eg:
 
-### `THUNK_ACTION`
+```js
+// using async-await
+await tester.dispatch(action());
+
+// using Promises
+Promise.resolve(tester.dispatch(action())) // dispatch always returns a promise
+  .then(() => {
+    // ...expectations here
+
+    done();
+  });
+
+// using a callback
+tester.dispatch(action(), () => {
+  // ...expectations here
+
+  done();
+});
+```
+
+### `THUNK_ACTION` type
 
 This `action.type` is logged when the action being dispatched is a direct function / thunk and not
 a functional payload of a "Flux Standard Action"
 
 ```js
 // Given
-const action = () => async (dispatch, getState, extraArgs) => {
+const action = () => (dispatch, getState, extraArgs) => {
   // code ...
 };
 
@@ -222,7 +239,7 @@ tester.dispatch({
 
 ### Flux Standard Action with Thunk payload
 
-p.s: **This is optional**
+Note: **This is optional**
 
 If you don't want to see "THUNK_ACTION" in your tests, you
 might want to consider dispatching FSA with a thunk payload.
