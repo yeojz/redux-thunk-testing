@@ -288,9 +288,18 @@ export class ActionTester implements ActionStore {
    * @param action TestAction | Function
    * @returns Promise<unknown>
    */
-  public dispatch = async (action: TestAction | Function): Promise<unknown> => {
+  public dispatch = async (
+    action: TestAction | Function,
+    done?: () => void
+  ): Promise<unknown> => {
     const runner = createActionRunner(this, ...this.thunkArgs);
-    return runner(action);
+    const result = await runner(action);
+
+    if (typeof done === 'function') {
+      done();
+    }
+
+    return result;
   };
 
   /**
