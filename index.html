@@ -85,8 +85,8 @@
 						</ul>
 					</li>
 					<li><a href="#notes">Notes</a><ul>
-							<li><a href="#thunks-are-assumed-to-be-async">Thunks are assumed to be async</a></li>
-							<li><a href="#thunkaction"><code>THUNK_ACTION</code></a></li>
+							<li><a href="#tests-are-async">Tests are async</a></li>
+							<li><a href="#thunkaction-type"><code>THUNK_ACTION</code> type</a></li>
 							<li><a href="#flux-standard-action-with-thunk-payload">Flux Standard Action with Thunk payload</a></li>
 						</ul>
 					</li>
@@ -200,7 +200,6 @@
 
   <span class="hljs-keyword">await</span> tester.dispatch(makeSandwichesForEverybody());
 
-
   <span class="hljs-comment">// Expectations</span>
   <span class="hljs-comment">// -------------------------------</span>
 
@@ -240,18 +239,33 @@
   ]);
 });</code></pre>
 				<h2 id="notes">Notes</h2>
-				<h3 id="thunks-are-assumed-to-be-async">Thunks are assumed to be async</h3>
-				<p>All thunks are treated as <code>async</code> methods / returning <code>promises</code>.
-					As such, you should always call <code>await</code> or <code>Promise.resolve</code> when
-				dispatching the action with ActionTester.</p>
-				<p>i.e. <code>await tester.dispatch(action())</code> or <code>Promise.resolve(tester.dispatch(action()))</code></p>
-				<p>Even if you&#39;re returning a basic type (eg: <code>boolean</code>, <code>string</code>), the parser will
-				still call it with <code>async</code> / <code>Promise.resolve</code></p>
-				<h3 id="thunk_action"><code>THUNK_ACTION</code></h3>
+				<h3 id="tests-are-async">Tests are async</h3>
+				<p>The runner treats all thunks as <code>async</code> methods / returning <code>promises</code>, even if you are
+				returning a basic type (eg: <code>boolean</code>, <code>string</code>).</p>
+				<p>As such, when using the tester, you should always use <code>await</code> or provide a <code>done</code> callback.</p>
+				<p>eg:</p>
+				<pre><code class="language-js"><span class="hljs-comment">// using async-await</span>
+<span class="hljs-keyword">await</span> tester.dispatch(action());
+
+<span class="hljs-comment">// using Promises</span>
+<span class="hljs-built_in">Promise</span>.resolve(tester.dispatch(action())) <span class="hljs-comment">// dispatch always returns a promise</span>
+  .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-comment">// ...expectations here</span>
+
+    done();
+  });
+
+<span class="hljs-comment">// using a callback</span>
+tester.dispatch(action(), () =&gt; {
+  <span class="hljs-comment">// ...expectations here</span>
+
+  done();
+});</code></pre>
+				<h3 id="thunk_action-type"><code>THUNK_ACTION</code> type</h3>
 				<p>This <code>action.type</code> is logged when the action being dispatched is a direct function / thunk and not
 				a functional payload of a &quot;Flux Standard Action&quot;</p>
 				<pre><code class="language-js"><span class="hljs-comment">// Given</span>
-<span class="hljs-keyword">const</span> action = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">async</span> (dispatch, getState, extraArgs) =&gt; {
+<span class="hljs-keyword">const</span> action = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> (dispatch, getState, extraArgs) =&gt; {
   <span class="hljs-comment">// code ...</span>
 };
 
@@ -264,7 +278,7 @@ tester.dispatch({
   <span class="hljs-attr">payload</span>: action()
 });</code></pre>
 				<h3 id="flux-standard-action-with-thunk-payload">Flux Standard Action with Thunk payload</h3>
-				<p>p.s: <strong>This is optional</strong></p>
+				<p>Note: <strong>This is optional</strong></p>
 				<p>If you don&#39;t want to see &quot;THUNK_ACTION&quot; in your tests, you
 				might want to consider dispatching FSA with a thunk payload.</p>
 				<p>i.e.</p>
