@@ -14,7 +14,7 @@ import {
   actionSnapshot
 } from './index';
 
-function runTestSuite(getTester: () => ActionTester) {
+function runTestSuite(name: string, getTester: () => ActionTester) {
   async function runCheck(extraArgs: unknown, expectedResult: string[]) {
     const tester = getTester();
 
@@ -24,7 +24,7 @@ function runTestSuite(getTester: () => ActionTester) {
     expect(tester.toTypes()).toEqual(expectedResult);
   }
 
-  test('path: 0 -> 3 -> 6', async () => {
+  test(`[${name}] path: 0 -> 3 -> 6`, async () => {
     await runCheck({}, [
       actionTypes.ACTION_0,
       actionTypes.ACTION_3,
@@ -32,7 +32,7 @@ function runTestSuite(getTester: () => ActionTester) {
     ]);
   });
 
-  test('path: 0 -> 1 -> 4 -> thunk -> 6', async () => {
+  test(`[${name}] path: 0 -> 1 -> 4 -> thunk -> 6`, async () => {
     await runCheck(
       {
         one: true
@@ -41,7 +41,7 @@ function runTestSuite(getTester: () => ActionTester) {
     );
   });
 
-  test('path: 0 -> 1 -> 2 -> 4', async () => {
+  test(`[${name}] path: 0 -> 1 -> 2 -> 4`, async () => {
     await runCheck(
       {
         one: true,
@@ -57,7 +57,7 @@ function runTestSuite(getTester: () => ActionTester) {
     );
   });
 
-  test('path: 0 -> 1 -> 2 -> 5 -> thunk -> 6', async () => {
+  test(`[${name}] path: 0 -> 1 -> 2 -> 5 -> thunk -> 6`, async () => {
     await runCheck(
       {
         one: true,
@@ -74,7 +74,7 @@ function runTestSuite(getTester: () => ActionTester) {
     );
   });
 
-  test('path: thunk -> 6', async () => {
+  test(`[${name}] path: thunk -> 6`, async () => {
     const tester = getTester();
     tester.setArgs(null, {});
     await tester.dispatch(actionAnonymous());
@@ -82,7 +82,7 @@ function runTestSuite(getTester: () => ActionTester) {
     expect(tester.toTypes()).toEqual([THUNK_ACTION, actionTypes.ACTION_6]);
   });
 
-  test('path: thunk -> 6 (use index())', async () => {
+  test(`[${name}] path: thunk -> 6 (use index())`, async () => {
     const tester = getTester();
     tester.setArgs(null, {});
     await tester.dispatch(actionAnonymous());
@@ -92,7 +92,7 @@ function runTestSuite(getTester: () => ActionTester) {
     expect(tester.index(1)).toHaveProperty('type', actionTypes.ACTION_6);
   });
 
-  test('step: 0 -> 3 -> 6', async () => {
+  test(`[${name}] step: 0 -> 3 -> 6`, async () => {
     const tester = getTester();
     tester.setArgs(null, {});
     await tester.dispatch(actionZero());
@@ -110,7 +110,7 @@ function runTestSuite(getTester: () => ActionTester) {
     expect(steps.next()).toBeUndefined();
   });
 
-  test('snapshot: 0 -> 3 -> 6', async () => {
+  test(`[${name}] snapshot: 0 -> 3 -> 6`, async () => {
     const tester = getTester();
 
     tester.setArgs(null, {});
@@ -125,7 +125,7 @@ function runTestSuite(getTester: () => ActionTester) {
     expect(tester.toSnapshot()).toEqual(expectedResult);
   });
 
-  test('snapshot: thunk -> 6', async () => {
+  test(`[${name}] snapshot: thunk -> 6`, async () => {
     const tester = getTester();
     tester.setArgs(null, {});
     await tester.dispatch(actionAnonymous());
@@ -139,19 +139,11 @@ function runTestSuite(getTester: () => ActionTester) {
   });
 }
 
-describe('index', () => {
-  describe('ActionTester', () => {
-    runTestSuite(() => new ActionTester());
-  });
+runTestSuite('ActionTester', () => new ActionTester());
 
-  describe('JestActionTester', () => {
-    runTestSuite(() => new JestActionTester(jest.fn()));
-  });
+runTestSuite('JestActionTester', () => new JestActionTester(jest.fn()));
 
-  describe('actionSnapshot', () => {
-    test('should return expected value', () => {
-      const current = actionSnapshot({ type: 'TEST' });
-      expect(current).toEqual(`Object {\n  "type": "TEST",\n}`);
-    });
-  });
+test('[actionSnapshot] should return expected value', () => {
+  const current = actionSnapshot({ type: 'TEST' });
+  expect(current).toEqual(`Object {\n  "type": "TEST",\n}`);
 });
