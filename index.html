@@ -75,8 +75,8 @@
 				<hr>
 				<!-- TOC depthFrom:2 -->
 				<ul>
+					<li><a href="#about">About</a></li>
 					<li><a href="#motivation">Motivation</a></li>
-					<li><a href="#about-this-package">About This Package</a></li>
 					<li><a href="#features">Features</a></li>
 					<li><a href="#installation">Installation</a></li>
 					<li><a href="#documentation">Documentation</a></li>
@@ -93,6 +93,12 @@
 					<li><a href="#license">License</a></li>
 				</ul>
 				<!-- /TOC -->
+				<h2 id="about">About</h2>
+				<p><code>redux-thunk-testing</code> is a small utility/wrapper which aims to help in testing complex thunk actions
+					and their side effects easily. The library runs through the action, executing all the thunks that
+				are found, and subsequently provides utilities around the results for testing.</p>
+				<p>Conceptually, this allows you to set all your conditions, before running the action similarly to how
+				it would execute in the context of your application.</p>
 				<h2 id="motivation">Motivation</h2>
 				<p><a href="https://www.npmjs.com/package/redux-thunk">redux-thunk</a> is a simple middleware for async and side-effects logic,
 				and is nearly as ubiquitous as redux itself.</p>
@@ -100,10 +106,6 @@
 					Some projects like <a href="https://www.npmjs.com/package/redux-saga">redux-saga</a> were created to help handle such issues, but
 					there might be situations where using such projects might not be a viable option due to
 				constraints and requirements of the project.</p>
-				<h2 id="about-this-package">About This Package</h2>
-				<p><code>redux-thunk-testing</code> is a small utility/wrapper which aims to help in testing complex thunk actions
-					and their side effects easily. Conceptually, it runs through the action, executing all the thunks that
-				are found, and subsequently provides utilities around the results for testing.</p>
 				<h2 id="features">Features</h2>
 				<ul>
 					<li>Supports <strong>Snapshot Testing</strong></li>
@@ -158,24 +160,23 @@
 				to a thunk. <em>This is the only change.</em></p>
 				<p><strong>Snippet:</strong></p>
 				<pre><code class="language-js">test(<span class="hljs-string">'have enough money to make sandwiches for all'</span>, <span class="hljs-keyword">async</span> () =&gt; {
-  <span class="hljs-comment">// Setup tester + other thunk paramters</span>
-  <span class="hljs-keyword">const</span> tester = <span class="hljs-keyword">new</span> JestActionTester(jest.fn());
-  <span class="hljs-comment">// OR if you're not using jest.</span>
-  <span class="hljs-keyword">const</span> tester = <span class="hljs-keyword">new</span> ActionTester();
+  <span class="hljs-comment">// Setup testing conditions</span>
+  <span class="hljs-comment">// -------------------------------</span>
 
-  <span class="hljs-comment">// Setup other optional thunk parameters if you use them.</span>
-  <span class="hljs-comment">// It is highly recommended to use thunk.withExtraArguments to inject</span>
-  <span class="hljs-comment">// your dependencies like apis. It makes testing much easier as shown here.</span>
+  <span class="hljs-comment">// It is recommended to use thunk.withExtraArguments to inject</span>
+  <span class="hljs-comment">// your dependencies like apis as you can avoid module mocking by doing so.</span>
   <span class="hljs-keyword">const</span> getState = jest.fn();
   <span class="hljs-keyword">const</span> extraArgs = {
     <span class="hljs-attr">api</span>: {
       <span class="hljs-attr">fetchSecretSauce</span>: jest.fn()
     }
   };
-  tester.setArgs(getState, extraArgs);
 
   <span class="hljs-comment">// Mocking the return values of api etc.</span>
-  extraArgs.api.fetchSecretSauce.mockImplementation(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-string">'sauce'</span>));
+  extraArgs.api.fetchSecretSauce.mockImplementation(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span>
+    <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-string">'sauce'</span>)
+  );
+
   getState.mockImplementation(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> ({
     <span class="hljs-attr">sandwiches</span>: {
       <span class="hljs-attr">isShopOpen</span>: <span class="hljs-literal">true</span>
@@ -183,8 +184,25 @@
     <span class="hljs-attr">myMoney</span>: <span class="hljs-number">100</span>
   }));
 
-  <span class="hljs-comment">// Dispatch the action</span>
+  <span class="hljs-comment">// Create the runner</span>
+  <span class="hljs-comment">// -------------------------------</span>
+
+  <span class="hljs-comment">// Setup tester + other thunk paramters</span>
+  <span class="hljs-keyword">const</span> tester = <span class="hljs-keyword">new</span> JestActionTester(jest.fn());
+  <span class="hljs-comment">// OR if you're not using jest.</span>
+  <span class="hljs-keyword">const</span> tester = <span class="hljs-keyword">new</span> ActionTester();
+
+  <span class="hljs-comment">// set the extra thunk arguments</span>
+  tester.setArgs(getState, extraArgs);
+
+  <span class="hljs-comment">// Run the action</span>
+  <span class="hljs-comment">// -------------------------------</span>
+
   <span class="hljs-keyword">await</span> tester.dispatch(makeSandwichesForEverybody());
+
+
+  <span class="hljs-comment">// Expectations</span>
+  <span class="hljs-comment">// -------------------------------</span>
 
   <span class="hljs-comment">// Using Jest Snapshot</span>
   expect(tester.calls).toMatchSnapshot();
@@ -235,7 +253,7 @@
 				<pre><code class="language-js"><span class="hljs-comment">// Given</span>
 <span class="hljs-keyword">const</span> action = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">async</span> (dispatch, getState, extraArgs) =&gt; {
   <span class="hljs-comment">// code ...</span>
-}
+};
 
 <span class="hljs-comment">// when testing</span>
 tester.dispatch(action());
@@ -244,7 +262,7 @@ tester.dispatch(action());
 tester.dispatch({
   <span class="hljs-attr">type</span>: <span class="hljs-string">'THUNK_ACTION'</span>,
   <span class="hljs-attr">payload</span>: action()
-})</code></pre>
+});</code></pre>
 				<h3 id="flux-standard-action-with-thunk-payload">Flux Standard Action with Thunk payload</h3>
 				<p>p.s: <strong>This is optional</strong></p>
 				<p>If you don&#39;t want to see &quot;THUNK_ACTION&quot; in your tests, you
@@ -254,27 +272,26 @@ tester.dispatch({
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">action</span>(<span class="hljs-params"></span>) </span>{
   <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">dispatch</span> =&gt;</span> {
     <span class="hljs-comment">// code</span>
-  }
+  };
 }
 
 <span class="hljs-comment">// Try</span>
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">action</span>(<span class="hljs-params"></span>) </span>{
   <span class="hljs-keyword">return</span> {
-    <span class="hljs-attr">type</span>: <span class="hljs-string">"NAMED_ACTION"</span>,
+    <span class="hljs-attr">type</span>: <span class="hljs-string">'NAMED_ACTION'</span>,
     <span class="hljs-attr">payload</span>: <span class="hljs-function"><span class="hljs-params">dispatch</span> =&gt;</span> {
       <span class="hljs-comment">// code</span>
     }
-  }
-}
-</code></pre>
+  };
+}</code></pre>
 				<p>However, in order to do the above, you will need the following middleware.</p>
 				<pre><code class="language-js"><span class="hljs-keyword">const</span> fsaThunk = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> next =&gt; <span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {
   <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> action.payload === <span class="hljs-string">'function'</span>) {
-     <span class="hljs-comment">// Convert to a thunk action</span>
+    <span class="hljs-comment">// Convert to a thunk action</span>
     <span class="hljs-keyword">return</span> next(action.payload);
   }
-   <span class="hljs-keyword">return</span> next(action);
-}
+  <span class="hljs-keyword">return</span> next(action);
+};
 
 <span class="hljs-comment">// Add it to your redux store.</span>
 <span class="hljs-keyword">import</span> thunk <span class="hljs-keyword">from</span> <span class="hljs-string">'redux-thunk'</span>;
@@ -309,20 +326,20 @@ tester.dispatch({
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/action.html" class="tsd-kind-icon">Action</a>
 					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/actionrunner.html" class="tsd-kind-icon">Action<wbr>Runner</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/actionstore.html" class="tsd-kind-icon">Action<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/actiontracer.html" class="tsd-kind-icon">Action<wbr>Tracer</a>
+					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/anyaction.html" class="tsd-kind-icon">Any<wbr>Action</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/asyncaction.html" class="tsd-kind-icon">Async<wbr>Action</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iactionrunner.html" class="tsd-kind-icon">IAction<wbr>Runner</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iactionstore.html" class="tsd-kind-icon">IAction<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iactiontracer.html" class="tsd-kind-icon">IAction<wbr>Tracer</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#calllist" class="tsd-kind-icon">Call<wbr>List</a>
