@@ -1,6 +1,6 @@
 {
   "name": "redux-thunk-testing",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Test utility and Snapshot testing for complex and nested redux-thunks",
   "main": "./index.js",
   "scripts": {
