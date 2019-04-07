@@ -11,8 +11,8 @@
 
 <!-- TOC depthFrom:2 -->
 
+- [About](#about)
 - [Motivation](#motivation)
-- [About This Package](#about-this-package)
 - [Features](#features)
 - [Installation](#installation)
 - [Documentation](#documentation)
@@ -26,6 +26,15 @@
 
 <!-- /TOC -->
 
+## About
+
+`redux-thunk-testing` is a small utility/wrapper which aims to help in testing complex thunk actions
+and their side effects easily. The library runs through the action, executing all the thunks that
+are found, and subsequently provides utilities around the results for testing.
+
+Conceptually, this allows you to set all your conditions, before running the action similarly to how
+it would execute in the context of your application.
+
 ## Motivation
 
 [redux-thunk][redux-thunk-link] is a simple middleware for async and side-effects logic,
@@ -35,12 +44,6 @@ However, as more complex flows and async actions are added, it becomes harder an
 Some projects like [redux-saga][redux-saga-link] were created to help handle such issues, but
 there might be situations where using such projects might not be a viable option due to
 constraints and requirements of the project.
-
-## About This Package
-
-`redux-thunk-testing` is a small utility/wrapper which aims to help in testing complex thunk actions
-and their side effects easily. Conceptually, it runs through the action, executing all the thunks that
-are found, and subsequently provides utilities around the results for testing.
 
 ## Features
 
@@ -77,7 +80,7 @@ Quick overview of functions / classes:
 
 The classes encapsulates the functions within this library.
 
-Please refer to [Project Documentation][project-docs] for the full list
+Please refer to [Project Documentation][project-docs-link] for the full list
 of available methods.
 
 ## Examples
@@ -102,24 +105,23 @@ to a thunk. _This is the only change._
 
 ```js
 test('have enough money to make sandwiches for all', async () => {
-  // Setup tester + other thunk paramters
-  const tester = new JestActionTester(jest.fn());
-  // OR if you're not using jest.
-  const tester = new ActionTester();
+  // Setup testing conditions
+  // -------------------------------
 
-  // Setup other optional thunk parameters if you use them.
-  // It is highly recommended to use thunk.withExtraArguments to inject
-  // your dependencies like apis. It makes testing much easier as shown here.
+  // It is recommended to use thunk.withExtraArguments to inject
+  // your dependencies like apis as you can avoid module mocking by doing so.
   const getState = jest.fn();
   const extraArgs = {
     api: {
       fetchSecretSauce: jest.fn()
     }
   };
-  tester.setArgs(getState, extraArgs);
 
   // Mocking the return values of api etc.
-  extraArgs.api.fetchSecretSauce.mockImplementation(() => Promise.resolve('sauce'));
+  extraArgs.api.fetchSecretSauce.mockImplementation(() =>
+    Promise.resolve('sauce')
+  );
+
   getState.mockImplementation(() => ({
     sandwiches: {
       isShopOpen: true
@@ -127,8 +129,25 @@ test('have enough money to make sandwiches for all', async () => {
     myMoney: 100
   }));
 
-  // Dispatch the action
+  // Create the runner
+  // -------------------------------
+
+  // Setup tester + other thunk paramters
+  const tester = new JestActionTester(jest.fn());
+  // OR if you're not using jest.
+  const tester = new ActionTester();
+
+  // set the extra thunk arguments
+  tester.setArgs(getState, extraArgs);
+
+  // Run the action
+  // -------------------------------
+
   await tester.dispatch(makeSandwichesForEverybody());
+
+
+  // Expectations
+  // -------------------------------
 
   // Using Jest Snapshot
   expect(tester.calls).toMatchSnapshot();
@@ -189,7 +208,7 @@ a functional payload of a "Flux Standard Action"
 // Given
 const action = () => async (dispatch, getState, extraArgs) => {
   // code ...
-}
+};
 
 // when testing
 tester.dispatch(action());
@@ -198,7 +217,7 @@ tester.dispatch(action());
 tester.dispatch({
   type: 'THUNK_ACTION',
   payload: action()
-})
+});
 ```
 
 ### Flux Standard Action with Thunk payload
@@ -215,19 +234,18 @@ i.e.
 function action() {
   return dispatch => {
     // code
-  }
+  };
 }
 
 // Try
 function action() {
   return {
-    type: "NAMED_ACTION",
+    type: 'NAMED_ACTION',
     payload: dispatch => {
       // code
     }
-  }
+  };
 }
-
 ```
 
 However, in order to do the above, you will need the following middleware.
@@ -235,11 +253,11 @@ However, in order to do the above, you will need the following middleware.
 ```js
 const fsaThunk = () => next => action => {
   if (typeof action.payload === 'function') {
-     // Convert to a thunk action
+    // Convert to a thunk action
     return next(action.payload);
   }
-   return next(action);
-}
+  return next(action);
+};
 
 // Add it to your redux store.
 import thunk from 'redux-thunk';
@@ -259,26 +277,20 @@ const store = createStore(
 
 [npm-badge]: https://img.shields.io/npm/v/redux-thunk-testing.svg?style=flat-square
 [npm-link]: https://www.npmjs.com/package/redux-thunk-testing
-[npm-next-badge]: https://img.shields.io/npm/v/redux-thunk-testing/next.svg?style=flat-square
-[npm-downloads-badge]: https://img.shields.io/npm/dt/redux-thunk-testing.svg?style=flat-square
 [circle-badge]: https://img.shields.io/circleci/project/github/yeojz/redux-thunk-testing/master.svg?style=flat-square
 [circle-link]: https://circleci.com/gh/yeojz/redux-thunk-testing
 [type-ts-badge]: https://img.shields.io/badge/typedef-.d.ts-blue.svg?style=flat-square&longCache=true
 [type-ts-link]: https://github.com/yeojz/redux-thunk-testing/tree/master/src/index.ts
 [codecov-badge]: https://img.shields.io/codecov/c/github/yeojz/redux-thunk-testing/master.svg?style=flat-square
 [codecov-link]: https://codecov.io/gh/yeojz/redux-thunk-testing
-[project-docs]: https://yeojz.github.io/redux-thunk-testing
-
+[project-docs-link]: https://yeojz.github.io/redux-thunk-testing
 [redux-saga-link]: https://www.npmjs.com/package/redux-saga
-
 [example-simple]: https://github.com/yeojz/redux-thunk-testing/blob/master/examples/simple
 [example-simple-snapshot]: https://github.com/yeojz/redux-thunk-testing/blob/master/examples/simple/__snapshots__/actions.test.js.snap
-
 [redux-thunk-link]: https://www.npmjs.com/package/redux-thunk
 [redux-thunk-readme-link]: https://github.com/reduxjs/redux-thunk/blob/d5b6921037ea4ac414e8b6ba3398e4cd6287784c/README.md#Composition
 [redux-thunk-readme-example]: https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme
 [redux-thunk-readme-example-action-js]: https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme/actions.js
 [redux-thunk-readme-example-snapshot]: https://github.com/yeojz/redux-thunk-testing/blob/master/examples/redux-thunk-readme/__snapshots__/actions.test.js.snap
-
 [article-redux-thunk-readme]: https://github.com/reduxjs/redux-thunk#injecting-a-custom-argument
 [article-medium]: https://medium.com/@yeojz/redux-thunk-skipping-mocks-using-withextraargument-513d38d38554

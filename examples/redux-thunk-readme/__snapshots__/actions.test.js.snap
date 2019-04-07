@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`complex makeSandwichesForEverybody have enough money to make sandwiches for all 1`] = `
+exports[`makeSandwichesForEverybody have enough money to make sandwiches for all 1`] = `
 Array [
   Object {
     "payload": [Function],
@@ -49,7 +49,7 @@ Array [
 ]
 `;
 
-exports[`complex makeSandwichesForEverybody not enough money to make sandwiches for all + no sauce for me 1`] = `
+exports[`makeSandwichesForEverybody not enough money to make sandwiches for all + no sauce for me 1`] = `
 Array [
   Object {
     "payload": [Function],
